@@ -1,0 +1,48 @@
+2025-04-12 16:39:08,723 : INFO : --- Starting Baseline Evaluation on Corrupted Data (stain_deposit, Severity 3) ---
+2025-04-12 16:39:08,724 : INFO : Arguments:
+2025-04-12 16:39:08,724 : INFO : {'baseline_methods': ['msp', 'energy'],
+ 'batch_size': 128,
+ 'ckpt_path': '/home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/10_04_10:31_erm_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2_200_128_trial_erm_1_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar',
+ 'corruption_name': 'stain_deposit',
+ 'feat_dim': 128,
+ 'gpu': 0,
+ 'head': 'mlp',
+ 'in_dataset': 'camelyon17',
+ 'model': 'resnet50',
+ 'normalize': False,
+ 'output_dir': '../baseline_results_corrupted/erm_resnet50',
+ 'prefetch': 4,
+ 'severity': 3,
+ 'wilds_root_dir': '../../data'}
+2025-04-12 16:39:08,725 : INFO : Loading model: resnet50, Head: mlp
+2025-04-12 16:39:09,006 : INFO : Loading checkpoint from: /home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/10_04_10:31_erm_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2_200_128_trial_erm_1_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar
+2025-04-12 16:39:12,164 : INFO : Checkpoint loaded successfully.
+2025-04-12 16:39:12,165 : INFO : Loading CLEAN ID dataloader (val split)...
+2025-04-12 16:39:12,462 : INFO : Clean ID loader size: 34904
+2025-04-12 16:39:12,462 : INFO : Loading CORRUPTED OOD dataloader (test split) with stain_deposit severity 3...
+2025-04-12 16:39:12,739 : INFO : Corrupted OOD loader size: 85054
+2025-04-12 16:39:12,739 : INFO : Processing ID data (val split) for Accuracy and Scores...
+2025-04-12 16:39:16,612 : INFO : Processed ID batch 100/273
+2025-04-12 16:39:20,101 : INFO : Processed ID batch 200/273
+2025-04-12 16:39:22,717 : INFO : ID Validation Accuracy: 0.9163
+2025-04-12 16:39:22,718 : INFO : Processing CORRUPTED OOD data (test split) for Scores...
+2025-04-12 16:39:26,953 : INFO : Processed OOD batch 100/665
+2025-04-12 16:39:31,040 : INFO : Processed OOD batch 200/665
+2025-04-12 16:39:35,085 : INFO : Processed OOD batch 300/665
+2025-04-12 16:39:39,140 : INFO : Processed OOD batch 400/665
+2025-04-12 16:39:43,155 : INFO : Processed OOD batch 500/665
+2025-04-12 16:39:47,217 : INFO : Processed OOD batch 600/665
+2025-04-12 16:39:49,984 : INFO : Calculating OOD detection metrics...
+2025-04-12 16:39:49,984 : INFO : --- Method: msp ---
+2025-04-12 16:39:50,019 : INFO : AUROC: 0.7034
+2025-04-12 16:39:50,019 : INFO : AUPR (In): 0.4348
+2025-04-12 16:39:50,019 : INFO : AUPR (Out): 0.8433
+2025-04-12 16:39:50,019 : INFO : FPR@95TPR: 0.8058
+2025-04-12 16:39:50,039 : INFO : Metrics saved to: ../baseline_results_corrupted/erm_resnet50/ood_metrics_msp_stain_deposit_sev3_checkpoint_max.txt
+2025-04-12 16:39:50,039 : INFO : --- Method: energy ---
+2025-04-12 16:39:50,080 : INFO : AUROC: 0.3757
+2025-04-12 16:39:50,080 : INFO : AUPR (In): 0.2310
+2025-04-12 16:39:50,080 : INFO : AUPR (Out): 0.6224
+2025-04-12 16:39:50,080 : INFO : FPR@95TPR: 0.9950
+2025-04-12 16:39:50,098 : INFO : Metrics saved to: ../baseline_results_corrupted/erm_resnet50/ood_metrics_energy_stain_deposit_sev3_checkpoint_max.txt
+2025-04-12 16:39:50,098 : INFO : --- Evaluation Finished ---

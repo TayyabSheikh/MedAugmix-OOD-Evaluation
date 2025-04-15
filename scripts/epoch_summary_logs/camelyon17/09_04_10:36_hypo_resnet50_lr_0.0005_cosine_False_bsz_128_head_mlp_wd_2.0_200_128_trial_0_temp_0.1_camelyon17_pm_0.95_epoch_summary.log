@@ -1,0 +1,112 @@
+2025-04-09 10:36:36,811 : --- Training Arguments ---
+{'augment': True,
+ 'batch_size': 128,
+ 'bottleneck': True,
+ 'cosine': False,
+ 'epochs': 200,
+ 'feat_dim': 128,
+ 'gpu': 0,
+ 'head': 'mlp',
+ 'id_loc': 'datasets/CIFAR10',
+ 'in_dataset': 'camelyon17',
+ 'learning_rate': 0.0005,
+ 'loss': 'hypo',
+ 'lr_decay_epochs': '100,150,180',
+ 'lr_decay_rate': 0.1,
+ 'mode': 'online',
+ 'model': 'resnet50',
+ 'momentum': 0.9,
+ 'normalize': False,
+ 'prefetch': 4,
+ 'print_freq': 10,
+ 'proto_m': 0.95,
+ 'save_epoch': 100,
+ 'seed': 4,
+ 'start_epoch': 0,
+ 'target_domain': 'cartoon',
+ 'temp': 0.1,
+ 'trial': '0',
+ 'use_domain': False,
+ 'w': 2.0,
+ 'warm': False,
+ 'weight_decay': 0.0001,
+ 'wilds_root_dir': '../../data'}
+2025-04-09 10:40:38,966 : Epoch: 0, ID Val Acc: 0.852299, OOD Test Acc: 0.843852
+2025-04-09 10:44:27,164 : Epoch: 1, ID Val Acc: 0.865330, OOD Test Acc: 0.777874
+2025-04-09 10:48:10,514 : Epoch: 2, ID Val Acc: 0.887149, OOD Test Acc: 0.810909
+2025-04-09 10:51:58,286 : Epoch: 3, ID Val Acc: 0.900886, OOD Test Acc: 0.770475
+2025-04-09 10:55:43,541 : Epoch: 4, ID Val Acc: 0.879105, OOD Test Acc: 0.792468
+2025-04-09 10:59:26,432 : Epoch: 5, ID Val Acc: 0.898196, OOD Test Acc: 0.803722
+2025-04-09 11:03:08,293 : Epoch: 6, ID Val Acc: 0.894400, OOD Test Acc: 0.843748
+2025-04-09 11:06:50,211 : Epoch: 7, ID Val Acc: 0.885627, OOD Test Acc: 0.744360
+2025-04-09 11:10:32,464 : Epoch: 8, ID Val Acc: 0.905118, OOD Test Acc: 0.813122
+2025-04-09 11:14:18,067 : Epoch: 9, ID Val Acc: 0.905490, OOD Test Acc: 0.797285
+2025-04-09 11:18:03,003 : Epoch: 10, ID Val Acc: 0.904778, OOD Test Acc: 0.822296
+2025-04-09 11:21:45,288 : Epoch: 11, ID Val Acc: 0.902746, OOD Test Acc: 0.827549
+2025-04-09 11:25:29,438 : Epoch: 12, ID Val Acc: 0.900373, OOD Test Acc: 0.773048
+2025-04-09 11:29:11,456 : Epoch: 13, ID Val Acc: 0.921498, OOD Test Acc: 0.798366
+2025-04-09 11:32:56,274 : Epoch: 14, ID Val Acc: 0.916089, OOD Test Acc: 0.779804
+2025-04-09 11:36:40,303 : Epoch: 15, ID Val Acc: 0.899910, OOD Test Acc: 0.850586
+2025-04-09 11:40:22,940 : Epoch: 16, ID Val Acc: 0.845969, OOD Test Acc: 0.765248
+2025-04-09 11:44:06,184 : Epoch: 17, ID Val Acc: 0.909642, OOD Test Acc: 0.838896
+2025-04-09 11:47:48,565 : Epoch: 18, ID Val Acc: 0.909096, OOD Test Acc: 0.775798
+2025-04-09 11:51:31,116 : Epoch: 19, ID Val Acc: 0.909195, OOD Test Acc: 0.805508
+2025-04-09 11:55:13,848 : Epoch: 20, ID Val Acc: 0.906320, OOD Test Acc: 0.818067
+2025-04-09 11:58:59,722 : Epoch: 21, ID Val Acc: 0.905217, OOD Test Acc: 0.803794
+2025-04-09 12:02:42,318 : Epoch: 22, ID Val Acc: 0.908022, OOD Test Acc: 0.773894
+2025-04-09 12:06:24,910 : Epoch: 23, ID Val Acc: 0.908037, OOD Test Acc: 0.806296
+2025-04-09 12:10:12,984 : Epoch: 24, ID Val Acc: 0.905194, OOD Test Acc: 0.828041
+2025-04-09 12:15:19,459 : Epoch: 25, ID Val Acc: 0.884587, OOD Test Acc: 0.803195
+2025-04-09 12:19:02,160 : Epoch: 26, ID Val Acc: 0.899770, OOD Test Acc: 0.792469
+2025-04-09 12:22:44,560 : Epoch: 27, ID Val Acc: 0.907793, OOD Test Acc: 0.790529
+2025-04-09 12:26:27,174 : Epoch: 28, ID Val Acc: 0.891065, OOD Test Acc: 0.801925
+2025-04-09 12:30:12,972 : Epoch: 29, ID Val Acc: 0.906193, OOD Test Acc: 0.803511
+2025-04-09 12:33:56,088 : Epoch: 30, ID Val Acc: 0.898838, OOD Test Acc: 0.781389
+2025-04-09 12:37:40,365 : Epoch: 31, ID Val Acc: 0.910397, OOD Test Acc: 0.803160
+2025-04-09 12:41:25,445 : Epoch: 32, ID Val Acc: 0.903011, OOD Test Acc: 0.805368
+2025-04-09 12:45:07,450 : Epoch: 33, ID Val Acc: 0.899624, OOD Test Acc: 0.789579
+2025-04-09 12:48:51,004 : Epoch: 34, ID Val Acc: 0.893958, OOD Test Acc: 0.786982
+2025-04-09 12:52:33,734 : Epoch: 35, ID Val Acc: 0.902569, OOD Test Acc: 0.841212
+2025-04-09 12:56:15,667 : Epoch: 36, ID Val Acc: 0.892667, OOD Test Acc: 0.728278
+2025-04-09 13:00:03,984 : Epoch: 37, ID Val Acc: 0.898776, OOD Test Acc: 0.809926
+2025-04-09 13:04:15,150 : Epoch: 38, ID Val Acc: 0.895188, OOD Test Acc: 0.815530
+2025-04-09 13:07:58,059 : Epoch: 39, ID Val Acc: 0.893031, OOD Test Acc: 0.837159
+2025-04-09 13:11:41,216 : Epoch: 40, ID Val Acc: 0.895776, OOD Test Acc: 0.832248
+2025-04-09 13:15:23,781 : Epoch: 41, ID Val Acc: 0.898682, OOD Test Acc: 0.770558
+2025-04-09 13:19:11,921 : Epoch: 42, ID Val Acc: 0.893302, OOD Test Acc: 0.754828
+2025-04-09 13:22:54,768 : Epoch: 43, ID Val Acc: 0.888018, OOD Test Acc: 0.764814
+2025-04-09 13:26:39,234 : Epoch: 44, ID Val Acc: 0.906622, OOD Test Acc: 0.779734
+2025-04-09 13:30:23,198 : Epoch: 45, ID Val Acc: 0.903747, OOD Test Acc: 0.782800
+2025-04-09 13:34:05,835 : Epoch: 46, ID Val Acc: 0.877831, OOD Test Acc: 0.803606
+2025-04-09 13:37:51,205 : Epoch: 47, ID Val Acc: 0.898008, OOD Test Acc: 0.798120
+2025-04-09 13:41:33,946 : Epoch: 48, ID Val Acc: 0.893026, OOD Test Acc: 0.763839
+2025-04-09 13:45:15,737 : Epoch: 49, ID Val Acc: 0.899509, OOD Test Acc: 0.737394
+2025-04-09 13:49:01,001 : Epoch: 50, ID Val Acc: 0.901570, OOD Test Acc: 0.811442
+2025-04-09 13:52:49,768 : Epoch: 51, ID Val Acc: 0.907621, OOD Test Acc: 0.804945
+2025-04-09 13:56:32,548 : Epoch: 52, ID Val Acc: 0.915246, OOD Test Acc: 0.793303
+2025-04-09 14:00:16,250 : Epoch: 53, ID Val Acc: 0.908240, OOD Test Acc: 0.832636
+2025-04-09 14:04:00,568 : Epoch: 54, ID Val Acc: 0.914289, OOD Test Acc: 0.837828
+2025-04-09 14:07:42,946 : Epoch: 55, ID Val Acc: 0.905235, OOD Test Acc: 0.837793
+2025-04-09 14:11:25,435 : Epoch: 56, ID Val Acc: 0.896921, OOD Test Acc: 0.811477
+2025-04-09 14:15:07,887 : Epoch: 57, ID Val Acc: 0.909710, OOD Test Acc: 0.841517
+2025-04-09 14:18:56,544 : Epoch: 58, ID Val Acc: 0.902527, OOD Test Acc: 0.768750
+2025-04-09 14:22:39,440 : Epoch: 59, ID Val Acc: 0.902982, OOD Test Acc: 0.810138
+2025-04-09 14:26:21,814 : Epoch: 60, ID Val Acc: 0.909653, OOD Test Acc: 0.801879
+2025-04-09 14:30:06,396 : Epoch: 61, ID Val Acc: 0.905646, OOD Test Acc: 0.816423
+2025-04-09 14:33:48,899 : Epoch: 62, ID Val Acc: 0.900253, OOD Test Acc: 0.806754
+2025-04-09 14:37:33,076 : Epoch: 63, ID Val Acc: 0.918407, OOD Test Acc: 0.805132
+2025-04-09 14:41:16,342 : Epoch: 64, ID Val Acc: 0.910124, OOD Test Acc: 0.777760
+2025-04-09 14:45:01,454 : Epoch: 65, ID Val Acc: 0.918467, OOD Test Acc: 0.781378
+2025-04-09 14:48:43,954 : Epoch: 66, ID Val Acc: 0.909752, OOD Test Acc: 0.814520
+2025-04-09 14:52:27,555 : Epoch: 67, ID Val Acc: 0.904486, OOD Test Acc: 0.791047
+2025-04-09 14:56:10,909 : Epoch: 68, ID Val Acc: 0.904861, OOD Test Acc: 0.798789
+2025-04-09 14:59:55,220 : Epoch: 69, ID Val Acc: 0.896588, OOD Test Acc: 0.789743
+2025-04-09 15:03:39,130 : Epoch: 70, ID Val Acc: 0.897693, OOD Test Acc: 0.773801
+2025-04-09 15:07:21,248 : Epoch: 71, ID Val Acc: 0.901466, OOD Test Acc: 0.779017
+2025-04-09 15:12:00,100 : Epoch: 72, ID Val Acc: 0.905100, OOD Test Acc: 0.758036
+2025-04-09 15:15:45,816 : Epoch: 73, ID Val Acc: 0.909697, OOD Test Acc: 0.805615
+2025-04-09 15:19:28,478 : Epoch: 74, ID Val Acc: 0.909309, OOD Test Acc: 0.771639
+2025-04-09 15:23:12,572 : Epoch: 75, ID Val Acc: 0.905732, OOD Test Acc: 0.799412
+2025-04-09 15:26:57,129 : Epoch: 76, ID Val Acc: 0.906005, OOD Test Acc: 0.835901
+2025-04-09 15:30:40,235 : Epoch: 77, ID Val Acc: 0.910896, OOD Test Acc: 0.763228
+2025-04-09 15:34:23,867 : Epoch: 78, ID Val Acc: 0.909671, OOD Test Acc: 0.774823

@@ -1,0 +1,98 @@
+2025-04-12 17:08:07,338 : --- Training Arguments (Corrupted) ---
+{'batch_size': 32,
+ 'bottleneck': True,
+ 'cosine': False,
+ 'epochs': 50,
+ 'feat_dim': 128,
+ 'gpu': 0,
+ 'head': 'mlp',
+ 'in_dataset': 'camelyon17',
+ 'learning_rate': 0.0005,
+ 'loss': 'hypo',
+ 'lr_decay_epochs': '20,35,45',
+ 'lr_decay_rate': 0.1,
+ 'mode': 'online',
+ 'model': 'resnet50',
+ 'momentum': 0.9,
+ 'normalize': True,
+ 'prefetch': 4,
+ 'print_freq': 50,
+ 'proto_m': 0.95,
+ 'save_epoch': 10,
+ 'seed': 4,
+ 'start_epoch': 0,
+ 'temp': 0.1,
+ 'trial': '0_corrupted',
+ 'use_domain': False,
+ 'w': 2.0,
+ 'warm': False,
+ 'weight_decay': 0.0001,
+ 'wilds_root_dir': '../../data'}
+2025-04-12 17:08:08,095 : Loading corrupted Camelyon17 dataset from ../../data...
+2025-04-12 17:08:18,632 : --- Starting Corrupted Training ---
+2025-04-12 17:34:59,613 : Epoch: 0, Clean ID Val Acc: 0.861366, Clean OOD Test Acc: 0.695947
+2025-04-12 17:34:59,613 : *** New Best ID Val Acc: 0.8614 (OOD Acc: 0.6959) at Epoch 0 ***
+2025-04-12 17:35:02,254 : Checkpoint saved to checkpoints/camelyon17_corrupted/20250412_170807_hypo_corrupted_resnet50_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2.0_50_128_trial_0_corrupted_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar
+2025-04-12 17:39:35,997 : Epoch: 1, Clean ID Val Acc: 0.829906, Clean OOD Test Acc: 0.757169
+2025-04-12 17:44:11,203 : Epoch: 2, Clean ID Val Acc: 0.790301, Clean OOD Test Acc: 0.764901
+2025-04-12 17:48:44,385 : Epoch: 3, Clean ID Val Acc: 0.848295, Clean OOD Test Acc: 0.754853
+2025-04-12 17:53:17,539 : Epoch: 4, Clean ID Val Acc: 0.856840, Clean OOD Test Acc: 0.835388
+2025-04-12 17:57:57,080 : Epoch: 5, Clean ID Val Acc: 0.493555, Clean OOD Test Acc: 0.491353
+2025-04-12 18:02:30,581 : Epoch: 6, Clean ID Val Acc: 0.775435, Clean OOD Test Acc: 0.625668
+2025-04-12 18:07:04,471 : Epoch: 7, Clean ID Val Acc: 0.779770, Clean OOD Test Acc: 0.730686
+2025-04-12 18:11:39,007 : Epoch: 8, Clean ID Val Acc: 0.810753, Clean OOD Test Acc: 0.581883
+2025-04-12 18:16:18,962 : Epoch: 9, Clean ID Val Acc: 0.783503, Clean OOD Test Acc: 0.557868
+2025-04-12 18:16:21,624 : Checkpoint saved to checkpoints/camelyon17_corrupted/20250412_170807_hypo_corrupted_resnet50_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2.0_50_128_trial_0_corrupted_temp_0.1_camelyon17_pm_0.95/checkpoint_10.pth.tar
+2025-04-12 18:16:21,625 : Saved periodic checkpoint at epoch 10
+2025-04-12 18:20:54,907 : Epoch: 10, Clean ID Val Acc: 0.800441, Clean OOD Test Acc: 0.674575
+2025-04-12 18:25:37,869 : Epoch: 11, Clean ID Val Acc: 0.790206, Clean OOD Test Acc: 0.809779
+2025-04-12 18:30:25,743 : Epoch: 12, Clean ID Val Acc: 0.531431, Clean OOD Test Acc: 0.666700
+2025-04-12 18:34:58,663 : Epoch: 13, Clean ID Val Acc: 0.800670, Clean OOD Test Acc: 0.711967
+2025-04-12 18:39:34,444 : Epoch: 14, Clean ID Val Acc: 0.757333, Clean OOD Test Acc: 0.713707
+2025-04-12 18:44:07,287 : Epoch: 15, Clean ID Val Acc: 0.773602, Clean OOD Test Acc: 0.740890
+2025-04-12 18:48:40,796 : Epoch: 16, Clean ID Val Acc: 0.706405, Clean OOD Test Acc: 0.777176
+2025-04-12 18:53:14,773 : Epoch: 17, Clean ID Val Acc: 0.789824, Clean OOD Test Acc: 0.760844
+2025-04-12 18:57:48,049 : Epoch: 18, Clean ID Val Acc: 0.782883, Clean OOD Test Acc: 0.593128
+2025-04-12 19:02:21,833 : Epoch: 19, Clean ID Val Acc: 0.781976, Clean OOD Test Acc: 0.631528
+2025-04-12 19:02:25,186 : Checkpoint saved to checkpoints/camelyon17_corrupted/20250412_170807_hypo_corrupted_resnet50_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2.0_50_128_trial_0_corrupted_temp_0.1_camelyon17_pm_0.95/checkpoint_20.pth.tar
+2025-04-12 19:02:25,187 : Saved periodic checkpoint at epoch 20
+2025-04-12 19:06:58,708 : Epoch: 20, Clean ID Val Acc: 0.771759, Clean OOD Test Acc: 0.389264
+2025-04-12 19:11:32,097 : Epoch: 21, Clean ID Val Acc: 0.726293, Clean OOD Test Acc: 0.694589
+2025-04-12 19:16:05,451 : Epoch: 22, Clean ID Val Acc: 0.680587, Clean OOD Test Acc: 0.440132
+2025-04-12 19:20:39,078 : Epoch: 23, Clean ID Val Acc: 0.725348, Clean OOD Test Acc: 0.424746
+2025-04-12 19:25:11,595 : Epoch: 24, Clean ID Val Acc: 0.768465, Clean OOD Test Acc: 0.552964
+2025-04-12 19:29:45,367 : Epoch: 25, Clean ID Val Acc: 0.727744, Clean OOD Test Acc: 0.442761
+2025-04-12 19:34:20,678 : Epoch: 26, Clean ID Val Acc: 0.802551, Clean OOD Test Acc: 0.454436
+2025-04-12 19:38:53,783 : Epoch: 27, Clean ID Val Acc: 0.778815, Clean OOD Test Acc: 0.565114
+2025-04-12 19:43:26,870 : Epoch: 28, Clean ID Val Acc: 0.778596, Clean OOD Test Acc: 0.476053
+2025-04-12 19:48:00,803 : Epoch: 29, Clean ID Val Acc: 0.704027, Clean OOD Test Acc: 0.497012
+2025-04-12 19:48:04,065 : Checkpoint saved to checkpoints/camelyon17_corrupted/20250412_170807_hypo_corrupted_resnet50_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2.0_50_128_trial_0_corrupted_temp_0.1_camelyon17_pm_0.95/checkpoint_30.pth.tar
+2025-04-12 19:48:04,065 : Saved periodic checkpoint at epoch 30
+2025-04-12 19:52:37,172 : Epoch: 30, Clean ID Val Acc: 0.700351, Clean OOD Test Acc: 0.482823
+2025-04-12 19:57:10,573 : Epoch: 31, Clean ID Val Acc: 0.736919, Clean OOD Test Acc: 0.504124
+2025-04-12 20:01:44,058 : Epoch: 32, Clean ID Val Acc: 0.772227, Clean OOD Test Acc: 0.286936
+2025-04-12 20:06:16,518 : Epoch: 33, Clean ID Val Acc: 0.719399, Clean OOD Test Acc: 0.450589
+2025-04-12 20:10:49,976 : Epoch: 34, Clean ID Val Acc: 0.763892, Clean OOD Test Acc: 0.474338
+2025-04-12 20:15:22,196 : Epoch: 35, Clean ID Val Acc: 0.737760, Clean OOD Test Acc: 0.339618
+2025-04-12 20:19:55,531 : Epoch: 36, Clean ID Val Acc: 0.674343, Clean OOD Test Acc: 0.497350
+2025-04-12 20:24:28,316 : Epoch: 37, Clean ID Val Acc: 0.799715, Clean OOD Test Acc: 0.380810
+2025-04-12 20:29:02,080 : Epoch: 38, Clean ID Val Acc: 0.748730, Clean OOD Test Acc: 0.515308
+2025-04-12 20:33:34,670 : Epoch: 39, Clean ID Val Acc: 0.698919, Clean OOD Test Acc: 0.434000
+2025-04-12 20:33:37,624 : Checkpoint saved to checkpoints/camelyon17_corrupted/20250412_170807_hypo_corrupted_resnet50_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2.0_50_128_trial_0_corrupted_temp_0.1_camelyon17_pm_0.95/checkpoint_40.pth.tar
+2025-04-12 20:33:37,624 : Saved periodic checkpoint at epoch 40
+2025-04-12 20:38:10,862 : Epoch: 40, Clean ID Val Acc: 0.679232, Clean OOD Test Acc: 0.427453
+2025-04-12 20:42:43,990 : Epoch: 41, Clean ID Val Acc: 0.764465, Clean OOD Test Acc: 0.510396
+2025-04-12 20:47:17,433 : Epoch: 42, Clean ID Val Acc: 0.680358, Clean OOD Test Acc: 0.402043
+2025-04-12 20:51:50,433 : Epoch: 43, Clean ID Val Acc: 0.693162, Clean OOD Test Acc: 0.477866
+2025-04-12 20:56:23,405 : Epoch: 44, Clean ID Val Acc: 0.721719, Clean OOD Test Acc: 0.347154
+2025-04-12 21:00:57,111 : Epoch: 45, Clean ID Val Acc: 0.695234, Clean OOD Test Acc: 0.330144
+2025-04-12 21:05:29,795 : Epoch: 46, Clean ID Val Acc: 0.648048, Clean OOD Test Acc: 0.454045
+2025-04-12 21:10:02,933 : Epoch: 47, Clean ID Val Acc: 0.623530, Clean OOD Test Acc: 0.456798
+2025-04-12 21:14:35,632 : Epoch: 48, Clean ID Val Acc: 0.651199, Clean OOD Test Acc: 0.350691
+2025-04-12 21:19:09,115 : Epoch: 49, Clean ID Val Acc: 0.639551, Clean OOD Test Acc: 0.418226
+2025-04-12 21:19:11,751 : Checkpoint saved to checkpoints/camelyon17_corrupted/20250412_170807_hypo_corrupted_resnet50_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2.0_50_128_trial_0_corrupted_temp_0.1_camelyon17_pm_0.95/checkpoint_50.pth.tar
+2025-04-12 21:19:11,751 : Saved periodic checkpoint at epoch 50
+2025-04-12 21:19:11,751 : --- Corrupted Training Finished ---
+2025-04-12 21:19:11,752 : Best ID Val Acc: 0.861366 (Epoch 0), Corresponding OOD Test Acc: 0.695947
+2025-04-12 21:19:11,752 : Best OOD Test Acc: 0.835388 (Epoch 4), Corresponding ID Val Acc: 0.856840
+2025-04-12 21:19:11,752 : Last Epoch (49) ID Val Acc: 0.639551, OOD Test Acc: 0.418226

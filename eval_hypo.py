@@ -43,7 +43,7 @@ parser.add_argument('--ckpt_name', type=str, default='ckpt_hypo_resnet18_cifar10
 
 parser.add_argument('--ckpt_loc', type=str, default='checkpoints/CIFAR-10',
                         help='loc of the model checkpoint')
-parser.add_argument('-b', '--batch_size', default= 128, type=int, 
+parser.add_argument('-b', '--batch_size', default= 128, type=int,
                     help='mini-batch size (default: 64)')
 parser.add_argument('--print-freq', '-p', default=10, type=int,
                     help='print frequency (default: 10)')
@@ -79,7 +79,7 @@ streamHandler = logging.StreamHandler()
 streamHandler.setFormatter(formatter)
 log.setLevel(logging.DEBUG)
 log.addHandler(fileHandler)
-log.addHandler(streamHandler) 
+log.addHandler(streamHandler)
 
 log.debug(state)
 
@@ -103,7 +103,7 @@ torch.cuda.manual_seed(args.seed)
 np.random.seed(args.seed)
 log.debug(f"Evaluating {args.ckpt_name}")
 
-        
+
 def to_np(x): return x.data.cpu().numpy()
 
 
@@ -180,7 +180,7 @@ def main():
 
     acc_cor = sum(accuracies_cor) / len(accuracies_cor)
 
-    if args.in_dataset == 'CIFAR-10':  
+    if args.in_dataset == 'CIFAR-10':
         print("OOD accuracy for generalization: {}, corrupted types is: {}".format(acc_cor, args.cortype))
     else:
         print("OOD accuracy for generalization: {}, target domain is: {}".format(acc_cor, args.target_domain))

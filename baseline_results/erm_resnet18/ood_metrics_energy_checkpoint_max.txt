@@ -1,0 +1,7 @@
+Checkpoint: /home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/08_04_14:24_erm_resnet18_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2_100_128_trial_erm_0_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar
+Method: energy
+ID Validation Accuracy: 0.842683
+AUROC: 0.577772
+AUPR (In): 0.477326
+AUPR (Out): 0.744141
+FPR@95TPR: 0.934359

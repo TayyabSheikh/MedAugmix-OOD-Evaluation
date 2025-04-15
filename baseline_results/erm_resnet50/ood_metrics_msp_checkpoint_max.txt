@@ -1,0 +1,8 @@
+Checkpoint: /home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/10_04_10:31_erm_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2_200_128_trial_erm_1_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar
+Method: msp
+ID Validation Accuracy: 0.916285
+OOD Generalization Accuracy: 0.802114
+AUROC: 0.572925
+AUPR (In): 0.326570
+AUPR (Out): 0.768597
+FPR@95TPR: 0.896160

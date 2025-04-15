@@ -1,0 +1,71 @@
+# OOD Detection Performance Report: HypO vs Baselines on Camelyon17
+
+This report summarizes the Out-of-Distribution (OOD) detection performance of the HypO method compared to standard baselines (MSP and Energy) on the Camelyon17 dataset. Experiments were conducted using both ResNet18 (100 epochs) and ResNet50 (200 epochs) architectures.
+
+## Experimental Setup
+
+*   **In-Distribution (ID) Data:** Camelyon17 'validation' split. Models were evaluated for their ability to correctly classify these samples (ID Validation Accuracy) and assign them appropriate scores indicating they are ID.
+*   **Out-of-Distribution (OOD) Data:** Camelyon17 'test' split. This split contains data from different hospitals than the training and validation splits, serving as the OOD set. The goal is to assign lower scores (indicating OOD) to these samples compared to ID samples.
+*   **Models:**
+    *   ERM (Empirical Risk Minimization): Standard ResNet models trained with Cross-Entropy loss.
+    *   HypO: ResNet models trained with the HypO loss function (Compactness + Disperseness).
+*   **Architectures:** ResNet18 (trained 100 epochs), ResNet50 (trained 200 epochs).
+*   **Evaluation Goal:** To assess how well different methods can distinguish between ID (validation split) and OOD (test split) samples based on a calculated score.
+
+## OOD Detection Methods & Scores
+
+1.  **MSP (Maximum Softmax Probability):**
+    *   **Applies to:** ERM model.
+    *   **Calculation:** Uses the maximum probability value from the softmax output of the classifier. `score = max(softmax(logits))`
+    *   **Interpretation:** Higher scores indicate higher confidence and are expected for ID samples.
+2.  **Energy Score:**
+    *   **Applies to:** ERM model.
+    *   **Calculation:** Based on the energy function derived from model logits. `score = -log(sum(exp(logits)))` (Lower energy is expected for ID samples). For metric calculation consistency (higher score = more likely ID), the negative energy score is used: `eval_score = -score`.
+    *   **Interpretation:** Lower energy scores (higher negative energy scores) indicate higher confidence and are expected for ID samples.
+3.  **HypO Score:**
+    *   **Applies to:** HypO model.
+    *   **Calculation:** Uses the maximum similarity score between the sample's normalized feature embedding and the learned class prototypes. `score = max(feature @ prototypes.T / temperature)`
+    *   **Interpretation:** Higher scores indicate higher similarity to learned ID prototypes and are expected for ID samples.
+
+## Evaluation Metrics Explained
+
+*   **ID Val Acc (ID Validation Accuracy):** Standard classification accuracy on the ID validation set. Higher is better.
+*   **OOD Gen Acc (OOD Generalization Accuracy):** Standard classification accuracy on the OOD test set. Higher is better.
+*   **AUROC (Area Under the Receiver Operating Characteristic Curve):** Measures the overall ability to distinguish between ID and OOD samples across all possible score thresholds. Ranges from 0 to 1, where 1 is perfect separation and 0.5 is random chance. Higher is better.
+*   **AUPR (In) (Area Under the Precision-Recall Curve - ID Positive):** Measures the trade-off between precision and recall when ID samples are considered the positive class. Useful when the focus is on correctly identifying ID samples. Higher is better.
+*   **AUPR (Out) (Area Under the Precision-Recall Curve - OOD Positive):** Measures the trade-off between precision and recall when OOD samples are considered the positive class. Useful when the focus is on correctly identifying OOD samples. Higher is better.
+*   **FPR@95TPR (False Positive Rate at 95% True Positive Rate):** The fraction of OOD samples that are incorrectly classified as ID (False Positives) when the score threshold is set such that 95% of ID samples are correctly classified as ID (True Positives). Lower is better (fewer OOD samples mistaken for ID).
+
+## Results Summary
+
+**ResNet18 @ 100 Epochs**
+
+| Method        | ID Val Acc | OOD Gen Acc | AUROC  | AUPR (In) | AUPR (Out) | FPR@95TPR |
+| :------------ | :--------- | :---------- | :----- | :-------- | :--------- | :-------- |
+| ERM + MSP     | 0.8427     | -           | 0.5484 | 0.3530    | 0.7195     | 0.9523    |
+| ERM + Energy  | 0.8427     | -           | 0.5778 | 0.4773    | 0.7441     | 0.9344    |
+| **HypO**      | 0.8727     | -           | 0.4638 | 0.2535    | 0.6874     | 0.9876    |
+
+*\*Note: Baseline results obtained by re-running evaluation with updated script.*
+
+**ResNet50 @ 200 Epochs**
+
+| Method        | ID Val Acc | OOD Gen Acc | AUROC  | AUPR (In) | AUPR (Out) | FPR@95TPR |
+| :------------ | :--------- | :---------- | :----- | :-------- | :--------- | :-------- |
+| ERM + MSP     | 0.9163     | 0.8021      | 0.5729 | 0.3266    | 0.7686     | 0.8962    |
+| ERM + Energy  | 0.9163     | 0.8021      | 0.5518 | 0.3316    | 0.7578     | 0.8902    |
+| **HypO**      | 0.9220     | 0.8232      | 0.6423 | 0.5924    | 0.7563     | 0.9528    |
+| **HypO+MedC** | 0.9292     | 0.8440      | 0.5938 | 0.4642    | 0.7405     | 0.9587    |
+
+## Interpretation & Conclusions
+
+*   **ResNet18 Performance:** With the ResNet18 architecture trained for 100 epochs, OOD detection performance was modest. ERM+Energy showed the best AUROC (0.5778) and FPR@95TPR (0.9344). HypO had lower AUROC and AUPR(In) but comparable AUPR(Out) in this configuration. ID Validation accuracy was highest for HypO.
+*   **ResNet50 Performance:** Switching to ResNet50 and training for 200 epochs yielded improvements across the board compared to ResNet18.
+    *   Comparing standard HypO to ERM, HypO achieved slightly higher ID accuracy (92.2% vs 91.6%) and notably higher OOD generalization accuracy (82.3% vs 80.2%).
+    *   Training HypO with MedMNIST-C augmentations (HypO+MedC) further improved both ID accuracy (to 92.9%) and OOD generalization accuracy (to 84.4%), suggesting the augmentations enhanced robustness.
+    *   For OOD detection, standard HypO achieved the highest AUROC (0.6423), indicating the best overall separability between ID and OOD samples. HypO+MedC had a lower AUROC (0.5938), closer to the ERM baselines (~0.55-0.57).
+    *   Standard HypO also showed the best precision in identifying ID samples (highest AUPR In: 0.5924). HypO+MedC's AUPR(In) (0.4642) was lower than standard HypO but still better than ERM baselines (~0.33).
+    *   At the specific 95% TPR threshold, the baseline methods (MSP and Energy on ERM) had the lowest False Positive Rate (FPR@95TPR ~0.89). Both HypO variants had higher FPR@95TPR (~0.95-0.96), suggesting they misclassified more OOD samples as ID at that particular operating point.
+*   **Overall:** The MedMNIST-C augmentations during HypO training successfully improved both in-distribution and out-of-distribution generalization accuracy on the clean test set. However, this came at the cost of slightly reduced OOD *detection* performance (lower AUROC and AUPR-In) compared to standard HypO training, although it remained competitive with or better than ERM baselines in these metrics. The choice between standard HypO and augmented HypO depends on whether the primary goal is maximizing generalization accuracy (favoring HypO+MedC) or maximizing the ability to distinguish ID from OOD samples based on the HypO score (favoring standard HypO).
+
+This report provides a snapshot based on the conducted experiments. Further analysis, hyperparameter tuning, or exploring different OOD datasets could yield additional insights.

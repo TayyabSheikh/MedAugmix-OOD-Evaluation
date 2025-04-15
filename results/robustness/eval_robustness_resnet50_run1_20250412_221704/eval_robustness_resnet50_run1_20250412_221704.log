@@ -1,0 +1,39 @@
+2025-04-12 22:17:04,169 : --- Evaluation Arguments ---
+{'batch_size': 128,
+ 'ckpt_erm': 'checkpoints/camelyon17/10_04_10:31_erm_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2_200_128_trial_erm_1_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar',
+ 'ckpt_hypo_clean': 'checkpoints/camelyon17/09_04_15:39_hypo_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2.0_200_128_trial_0_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar',
+ 'ckpt_hypo_corrupted': 'checkpoints/camelyon17_corrupted/20250412_170807_hypo_corrupted_resnet50_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2.0_50_128_trial_0_corrupted_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar',
+ 'feat_dim': 128,
+ 'gpu': 0,
+ 'head': 'mlp',
+ 'model': 'resnet50',
+ 'normalize': True,
+ 'prefetch': 4,
+ 'results_dir': '../results/robustness',
+ 'results_suffix': '_run1',
+ 'seed': 42,
+ 'temp': 0.1,
+ 'wilds_root_dir': '../../data'}
+2025-04-12 22:17:04,169 : Log directory: ../results/robustness/eval_robustness_resnet50_run1_20250412_221704
+2025-04-12 22:17:04,175 : Loading clean Camelyon17 data...
+2025-04-12 22:17:04,510 : Clean test loader created with 85054 samples.
+2025-04-12 22:17:04,797 : Loading erm model from: checkpoints/camelyon17/10_04_10:31_erm_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2_200_128_trial_erm_1_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar
+2025-04-12 22:17:05,137 : Loading hypo_clean model from: checkpoints/camelyon17/09_04_15:39_hypo_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2.0_200_128_trial_0_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar
+2025-04-12 22:17:15,316 : Loaded DisLoss criterion state (prototypes).
+2025-04-12 22:17:15,317 : Loading hypo_corrupted model from: checkpoints/camelyon17_corrupted/20250412_170807_hypo_corrupted_resnet50_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2.0_50_128_trial_0_corrupted_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar
+2025-04-12 22:17:24,840 : Loaded DisLoss criterion state (prototypes).
+2025-04-12 22:17:24,842 : --- Evaluating on Clean Test Data ---
+2025-04-12 22:17:24,842 : Evaluating ERM...
+2025-04-12 22:17:48,047 : ERM Clean Accuracy: 0.8021
+2025-04-12 22:17:48,047 : Evaluating Hypo_Clean...
+2025-04-12 22:18:11,271 : Hypo_Clean Clean Accuracy: 0.8232
+2025-04-12 22:18:11,271 : Evaluating Hypo_Corrupted...
+2025-04-12 22:18:34,252 : Hypo_Corrupted Clean Accuracy: 0.6959
+2025-04-12 22:18:34,252 : Corruption functions not available. Skipping corrupted evaluation.
+2025-04-12 22:18:34,258 : Robustness evaluation results saved to: ../results/robustness/eval_robustness_resnet50_run1_20250412_221704/eval_robustness_resnet50_run1_20250412_221704_results.csv
+2025-04-12 22:18:34,260 : 
+            Model Corruption  Severity  Accuracy
+0             ERM      clean         0  0.802114
+1      Hypo_Clean      clean         0  0.823242
+2  Hypo_Corrupted      clean         0  0.695934
+2025-04-12 22:18:34,261 : --- Evaluation Script Finished ---

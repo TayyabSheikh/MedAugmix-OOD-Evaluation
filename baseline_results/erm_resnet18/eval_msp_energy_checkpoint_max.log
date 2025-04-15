@@ -1,0 +1,43 @@
+2025-04-11 19:29:01,916 : INFO : --- Starting Baseline Evaluation ---
+2025-04-11 19:29:01,916 : INFO : Arguments:
+2025-04-11 19:29:01,917 : INFO : {'baseline_methods': ['msp', 'energy'],
+ 'batch_size': 128,
+ 'ckpt_path': '/home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/08_04_14:24_erm_resnet18_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2_100_128_trial_erm_0_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar',
+ 'feat_dim': 128,
+ 'gpu': 0,
+ 'head': 'mlp',
+ 'in_dataset': 'camelyon17',
+ 'model': 'resnet18',
+ 'normalize': False,
+ 'output_dir': '../baseline_results/erm_resnet18',
+ 'prefetch': 4,
+ 'wilds_root_dir': '../../data'}
+2025-04-11 19:29:01,918 : INFO : Loading model: resnet18, Head: mlp
+2025-04-11 19:29:02,485 : INFO : Loading checkpoint from: /home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/08_04_14:24_erm_resnet18_lr_0.0005_cosine_False_bsz_32_head_mlp_wd_2_100_128_trial_erm_0_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar
+2025-04-11 19:29:04,314 : INFO : Checkpoint loaded successfully.
+2025-04-11 19:29:04,315 : INFO : Loading dataloaders...
+2025-04-11 19:29:05,471 : INFO : Processing ID data (val split) for Accuracy and Scores...
+2025-04-11 19:29:28,772 : INFO : Processed ID batch 100/273
+2025-04-11 19:30:06,771 : INFO : Processed ID batch 200/273
+2025-04-11 19:30:45,509 : INFO : ID Validation Accuracy: 0.8427
+2025-04-11 19:30:45,510 : INFO : Processing OOD data (test split) for Scores...
+2025-04-11 19:31:24,760 : INFO : Processed OOD batch 100/665
+2025-04-11 19:32:20,142 : INFO : Processed OOD batch 200/665
+2025-04-11 19:33:13,155 : INFO : Processed OOD batch 300/665
+2025-04-11 19:34:09,997 : INFO : Processed OOD batch 400/665
+2025-04-11 19:35:14,232 : INFO : Processed OOD batch 500/665
+2025-04-11 19:36:19,262 : INFO : Processed OOD batch 600/665
+2025-04-11 19:37:00,190 : INFO : Calculating OOD detection metrics...
+2025-04-11 19:37:00,191 : INFO : --- Method: msp ---
+2025-04-11 19:37:00,227 : INFO : AUROC: 0.5484
+2025-04-11 19:37:00,227 : INFO : AUPR (In): 0.3530
+2025-04-11 19:37:00,227 : INFO : AUPR (Out): 0.7195
+2025-04-11 19:37:00,227 : INFO : FPR@95TPR: 0.9523
+2025-04-11 19:37:00,263 : INFO : Metrics saved to: ../baseline_results/erm_resnet18/ood_metrics_msp_checkpoint_max.txt
+2025-04-11 19:37:00,264 : INFO : --- Method: energy ---
+2025-04-11 19:37:00,311 : INFO : AUROC: 0.5778
+2025-04-11 19:37:00,311 : INFO : AUPR (In): 0.4773
+2025-04-11 19:37:00,311 : INFO : AUPR (Out): 0.7441
+2025-04-11 19:37:00,311 : INFO : FPR@95TPR: 0.9344
+2025-04-11 19:37:00,346 : INFO : Metrics saved to: ../baseline_results/erm_resnet18/ood_metrics_energy_checkpoint_max.txt
+2025-04-11 19:37:00,346 : INFO : --- Evaluation Finished ---

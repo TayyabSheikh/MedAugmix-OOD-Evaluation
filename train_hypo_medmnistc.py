@@ -23,9 +23,14 @@ from sklearn.metrics import accuracy_score
 from utils import (CompLoss, CompNGLoss, DisLoss, DisLPLoss,
                 AverageMeter, adjust_learning_rate, warmup_learning_rate,
                 set_loader_small, set_loader_ImageNet, set_model)
-from dataloader.camelyon17_wilds import get_camelyon17_dataloaders # Added import
+# Import the new augmented dataloader specifically for this script
+from dataloader.camelyon17_wilds_medmnistc import get_camelyon17_medmnistc_dataloaders
 
-parser = argparse.ArgumentParser(description='Script for training with HYPO')
+# Keep standard loader import for other datasets if needed by set_loader_small
+from dataloader.camelyon17_wilds import get_camelyon17_dataloaders
+
+# Updated description
+parser = argparse.ArgumentParser(description='Script for training with HYPO using MedMNIST-C augmentations for Camelyon17')
 parser.add_argument('--gpu', default=6, type=int, help='which GPU to use')
 parser.add_argument('--seed', default=4, type=int, help='random seed')  # original 4
 parser.add_argument('--w', default=2, type=float,
@@ -35,7 +40,7 @@ parser.add_argument('--proto_m', default= 0.95, type=float,
 parser.add_argument('--feat_dim', default = 128, type=int,
                     help='feature dim')
 # Added 'camelyon17' to choices
-parser.add_argument('--in-dataset', default="CIFAR-10", type=str, help='in-distribution dataset', choices=['PACS', 'VLCS', 'CIFAR-10', 'CIFAR-100', 'ImageNet-100', 'OfficeHome', 'terra_incognita', 'camelyon17'])
+parser.add_argument('--in-dataset', default="camelyon17", type=str, help='in-distribution dataset', choices=['PACS', 'VLCS', 'CIFAR-10', 'CIFAR-100', 'ImageNet-100', 'OfficeHome', 'terra_incognita', 'camelyon17'])
 parser.add_argument('--id_loc', default="datasets/CIFAR10", type=str, help='location of in-distribution dataset (used for non-WILDS datasets)')
 # Added argument for WILDS data root
 parser.add_argument('--wilds_root_dir', default="./data", type=str, help='Root directory for WILDS datasets.')
@@ -87,7 +92,7 @@ parser.set_defaults(bottleneck=True)
 parser.set_defaults(augment=True)
 
 args = parser.parse_args()
-torch.cuda.set_device(args.gpu) 
+torch.cuda.set_device(args.gpu)
 state = {k: v for k, v in args._get_kwargs()}
 
 date_time = datetime.now().strftime("%d_%m_%H:%M")
@@ -96,21 +101,28 @@ date_time = datetime.now().strftime("%d_%m_%H:%M")
 args.lr_decay_epochs = [int(step) for step in args.lr_decay_epochs.split(',')]
 
 
-# Adjusted naming logic for camelyon17
-if args.in_dataset in ["ImageNet-100", 'CIFAR-10', 'camelyon17']: # Added camelyon17 here
-    args.name = (f"{date_time}_{args.loss}_{args.model}_lr_{args.learning_rate}_cosine_"
-        f"{args.cosine}_bsz_{args.batch_size}_head_{args.head}_wd_{args.w}_{args.epochs}_{args.feat_dim}_"
-        f"trial_{args.trial}_temp_{args.temp}_{args.in_dataset}_pm_{args.proto_m}")
+# Construct base name parts
+base_name_parts = [
+    date_time, args.loss, args.model,
+    f"lr_{args.learning_rate}", f"cosine_{args.cosine}",
+    f"bsz_{args.batch_size}", f"head_{args.head}", f"wd_{args.w}",
+    f"{args.epochs}", f"{args.feat_dim}", f"trial_{args.trial}",
+    f"temp_{args.temp}", args.in_dataset, f"pm_{args.proto_m}"
+]
 
-else:
-    args.name = (f"{date_time}_{args.loss}_std_{args.model}_lr_{args.learning_rate}_cosine_"
-        f"{args.cosine}_bsz_{args.batch_size}_td_{args.target_domain}_head_{args.head}_wd_{args.w}_{args.epochs}_{args.feat_dim}_"
-        f"trial_{args.trial}_temp_{args.temp}_{args.in_dataset}_pm_{args.proto_m}")
+# Add target domain if relevant (for non-ImageNet/CIFAR/Camelyon)
+if args.in_dataset not in ["ImageNet-100", 'CIFAR-10', 'CIFAR-100', 'camelyon17']:
+    base_name_parts.insert(7, f"td_{args.target_domain}") # Insert after bsz
+
+# Add MedMNIST-C suffix if dataset is Camelyon17 (this script always uses it)
+if args.in_dataset == 'camelyon17':
+    base_name_parts.append("medmnistc")
+
+args.name = "_".join(base_name_parts)
+
 
 # Adjusted directory logic slightly for clarity (using f-strings)
 args.log_directory = f"logs/{args.in_dataset}/{args.name}/"
-# WARNING: Hardcoded path /nobackup2/yf/ might need adjustment depending on the system. Using a relative path for now.
-# args.model_directory = "/nobackup2/yf/checkpoints/hypo_cr/{in_dataset}/{name}/".format(in_dataset=args.in_dataset, name= args.name)
 args.model_directory = f"checkpoints/{args.in_dataset}/{args.name}/" # Using relative path
 
 
@@ -160,7 +172,7 @@ log.addHandler(summaryFileHandler)
 
 log.debug(f"Detailed log: {detail_log_path}")
 log.debug(f"Epoch summary log: {summary_log_path}")
-log.info(f"--- Training Arguments ---\n{pprint.pformat(state)}") # Log args to INFO level for summary file
+log.info(f"--- Training Arguments (MedMNIST-C Augmented) ---\n{pprint.pformat(state)}") # Log args to INFO level for summary file
 
 if args.in_dataset == "CIFAR-10":
     args.n_cls = 10
@@ -195,7 +207,7 @@ if args.warm:
                 1 + math.cos(math.pi * args.warm_epochs / args.epochs)) / 2
     else:
         args.warmup_to = args.learning_rate
-        
+
 def to_np(x): return x.data.cpu().numpy()
 
 def main():
@@ -203,7 +215,7 @@ def main():
 
     wandb.init(
         # Set the project where this run will be logged
-        project="hypo-camelyon17-200" if args.in_dataset == 'camelyon17' else "hypo", # Adjusted wandb project name
+        project="hypo-camelyon17-200-medmnistc" if args.in_dataset == 'camelyon17' else "hypo", # Adjusted wandb project name
         # We pass a run name (otherwise it’ll be randomly assigned, like sunshine-lollypop-10)
         name=args.name,
         # Track hyperparameters and run metadata
@@ -214,14 +226,16 @@ def main():
     if args.in_dataset == "ImageNet-100":
         train_loader, val_loader, test_loader = set_loader_ImageNet(args)
     elif args.in_dataset == 'camelyon17':
-        # Use the new dataloader function
-        train_loader, val_loader, test_loader = get_camelyon17_dataloaders(
+        # Use the MedMNIST-C augmented dataloader function
+        log.info("Using MedMNIST-C augmented dataloader for Camelyon17 training.")
+        train_loader, val_loader, test_loader = get_camelyon17_medmnistc_dataloaders(
             root_dir=args.wilds_root_dir,
             batch_size=args.batch_size,
-            num_workers=args.prefetch # Use prefetch argument for num_workers
+            num_workers=args.prefetch,
+            corruption_dataset_name="bloodmnist" # Hardcoded based on previous discussion
         )
         if train_loader is None:
-             log.error(f"Failed to load Camelyon17 dataset from {args.wilds_root_dir}. Exiting.")
+             log.error(f"Failed to load MedMNIST-C augmented Camelyon17 dataset from {args.wilds_root_dir}. Exiting.")
              return # Exit if dataloaders failed
     elif args.in_dataset in ['CIFAR-10', 'CIFAR-100', 'PACS', 'VLCS', 'OfficeHome', 'terra_incognita']:
         # Fallback to original loaders for other datasets
@@ -272,7 +286,7 @@ def main():
             tb_log.log_value('train_ce_loss', train_sloss, epoch) # Use train_sloss for CE loss (as returned by train_hypo)
             wandb.log({'CE Loss Ep': train_sloss})
 
-        wandb.log({'Comp Loss Ep': train_uloss,'Dis Loss Ep': train_dloss })
+        # wandb.log({'Comp Loss Ep': train_uloss,'Dis Loss Ep': train_dloss }) # Duplicated log? Removed.
         tb_log.log_value('learning_rate', optimizer.param_groups[0]['lr'], epoch)
         wandb.log({'current lr': optimizer.param_groups[0]['lr'], 'acc':acc, 'acc cor': acc_cor})
 
@@ -356,13 +370,20 @@ def train_hypo(args, train_loader, val_loader, test_loader, model, criterion_com
         if args.in_dataset == 'camelyon17':
              input, target, metadata = values # Unpack WILDS tuple
              # Access domain ID using tensor indexing (trying index 0 based on error size 4)
-             domain = metadata[:, 0]
+             # Domain info might not be strictly needed if not used in loss, but kept for consistency
+             try:
+                 domain = metadata[:, 0]
+             except IndexError:
+                 domain = None # Handle cases where metadata might be different
         elif len(values) == 3: # Original handling for other datasets like PACS
             input, target, domain = values
         elif len(values) == 2: # Original handling for datasets like CIFAR
             input, target = values
             domain = None
-        
+        else:
+            log.warning(f"Unexpected data format from loader: {len(values)} items.")
+            continue # Skip batch if format is unknown
+
         warmup_learning_rate(args, epoch, i, len(train_loader), optimizer)
         bsz = target.shape[0]
 
@@ -382,7 +403,7 @@ def train_hypo(args, train_loader, val_loader, test_loader, model, criterion_com
             if criterion_dis is None or criterion_comp is None:
                  raise ValueError("HypO criteria not initialized for hypo loss.")
             dis_loss = criterion_dis(features, target)
-            comp_loss = criterion_comp(features, criterion_dis.prototypes, target, None)
+            comp_loss = criterion_comp(features, criterion_dis.prototypes, target, None) # Domain is None here, adjust if needed
             loss = args.w * comp_loss + dis_loss
             # Update HypO loss meters
             dis_losses.update(dis_loss.item(), bsz) # Use item() and bsz
@@ -411,15 +432,26 @@ def train_hypo(args, train_loader, val_loader, test_loader, model, criterion_com
         end = time.time()
         # Restore per-batch console logging (also goes to file via logger setup)
         if i % args.print_freq == 0:
-             log.debug('Epoch: [{0}][{1}/{2}]\t'
-                 'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                 'Dis Loss {dloss.val:.4f} ({dloss.avg:.4f})\t'
-                 'Comp Loss {uloss.val:.4f} ({uloss.avg:.4f})\t'.format(
-                     epoch, i, len(train_loader), batch_time=batch_time, dloss=dis_losses, uloss = comp_losses))
+             # Log relevant loss based on mode
+             if args.loss == 'hypo':
+                 log.debug('Epoch: [{0}][{1}/{2}]\t'
+                     'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                     'Dis Loss {dloss.val:.4f} ({dloss.avg:.4f})\t'
+                     'Comp Loss {uloss.val:.4f} ({uloss.avg:.4f})\t'.format(
+                         epoch, i, len(train_loader), batch_time=batch_time, dloss=dis_losses, uloss = comp_losses))
+             elif args.loss == 'erm':
+                 log.debug('Epoch: [{0}][{1}/{2}]\t'
+                     'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                     'CE Loss {loss.val:.4f} ({loss.avg:.4f})\t'.format(
+                         epoch, i, len(train_loader), batch_time=batch_time, loss=losses))
+
 
          # Keep wandb logging per step if desired (or move to end of epoch)
         if i % args.print_freq == 0: # Log wandb less frequently too if needed
-         wandb.log({'Dis Loss' : dis_losses.val, 'Comp Loss' :  comp_losses.val})
+            if args.loss == 'hypo':
+                wandb.log({'Dis Loss' : dis_losses.val, 'Comp Loss' :  comp_losses.val})
+            elif args.loss == 'erm':
+                wandb.log({'CE Loss' : losses.val})
 
 
     model.eval()
@@ -429,13 +461,16 @@ def train_hypo(args, train_loader, val_loader, test_loader, model, criterion_com
             # Adjusted data unpacking for WILDS in validation loop
             if args.in_dataset == 'camelyon17':
                  input, target, metadata = values
-                 # Access domain ID using tensor indexing (trying index 0)
-                 domain = metadata[:, 0]
+                 # Domain info might not be needed for eval
+                 # domain = metadata[:, 0]
             elif len(values) == 3:
                 input, target, domain = values
             elif len(values) == 2:
                 input, target = values
                 domain = None
+            else:
+                log.warning(f"Unexpected data format from val_loader: {len(values)} items.")
+                continue
             # Correctly indented processing steps (outside the if/elif/else)
             input = input.cuda()
             target = target.cuda()
@@ -474,13 +509,16 @@ def train_hypo(args, train_loader, val_loader, test_loader, model, criterion_com
                 # Adjusted data unpacking for WILDS in test loop
                 if args.in_dataset == 'camelyon17':
                      input, target, metadata = values
-                     # Access domain ID using tensor indexing (trying index 0)
-                     domain = metadata[:, 0]
+                     # Domain info might not be needed for eval
+                     # domain = metadata[:, 0]
                 elif len(values) == 3:
                     input, target, domain = values
                 elif len(values) == 2:
                     input, target = values
                     domain = None
+                else:
+                    log.warning(f"Unexpected data format from test_loader: {len(values)} items.")
+                    continue
                 # Correctly indented processing steps (outside the if/elif/else)
                 input = input.cuda()
                 target = target.cuda()
@@ -523,9 +561,9 @@ def train_hypo(args, train_loader, val_loader, test_loader, model, criterion_com
 def save_checkpoint(args, state, epoch, save_best = False):
     """Saves checkpoint to disk"""
     if save_best:
-        filename = args.model_directory + 'checkpoint_max.pth.tar'
+        filename = os.path.join(args.model_directory, 'checkpoint_max.pth.tar') # Use os.path.join
     else:
-        filename = args.model_directory + f'checkpoint_{epoch}.pth.tar'
+        filename = os.path.join(args.model_directory, f'checkpoint_{epoch}.pth.tar') # Use os.path.join
     torch.save(state, filename)
 
 
