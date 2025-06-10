@@ -138,17 +138,49 @@ class DenseNet(nn.Module):
 
 model_dict = {
     'densenet100': [DenseNet, 342],
+    'densenet121': [None, 1024], # Add densenet121, func is None as loaded from torchvision
 }
 
+# Need to import torchvision models here
+import torchvision.models as tv_models
+
 class SupCEHeadDenseNet(nn.Module):
-    """encoder + classifier"""
-    def __init__(self, name='densenet100', head='linear', feat_dim = 128, num_classes=100, multiplier = 1):
+    """encoder + head for DenseNet models"""
+    # Added args to pass model name, head type, feat_dim, n_cls etc.
+    def __init__(self, args, multiplier=1):
         super(SupCEHeadDenseNet, self).__init__()
+        name = args.model # Get model name from args
+        head = args.head
+        feat_dim = args.feat_dim
+        num_classes = args.n_cls # Use n_cls from args
+
+        if name not in model_dict:
+            raise ValueError(f"Unsupported DenseNet model name: {name}")
+
         model_fun, dim_in = model_dict[name]
-        self.encoder = model_fun()
-        self.fc = nn.Linear(dim_in, num_classes)
         self.multiplier = multiplier
 
+        # Load encoder based on model name
+        # Determine if pretrained weights should be used.
+        # Defaults to True if 'model_pretrained' is not in args.
+        use_pretrained = getattr(args, 'model_pretrained', True)
+
+        if name == 'densenet121':
+            print(f"Loading DenseNet121. Pretrained: {use_pretrained}")
+            tv_model = tv_models.densenet121(pretrained=use_pretrained)
+            dim_in = tv_model.classifier.in_features # Should be 1024
+            self.encoder = tv_model.features
+            self.encoder.add_module('avgpool', nn.AdaptiveAvgPool2d((1, 1)))
+            print(f"Using torchvision pretrained DenseNet-121. Feature dim: {dim_in}")
+        elif model_fun is not None: # Handle custom DenseNet (e.g., densenet100)
+            self.encoder = model_fun()
+            print(f"Using custom DenseNet: {name}. Feature dim: {dim_in}")
+        else:
+             raise ValueError(f"Model function not found for {name}")
+
+        # self.fc = nn.Linear(dim_in, num_classes) # Not used directly?
+
+        # Initialize head
         if head == 'linear':
             self.head = nn.Linear(dim_in, feat_dim)
         elif head == 'mlp':
@@ -160,13 +192,32 @@ class SupCEHeadDenseNet(nn.Module):
         
 
     def forward(self, x):
-        features = self.encoder(x)
-        return self.fc(features)
-    
-    def intermediate_forward(self, x, layer_index):
-        if layer_index == 0:
-            return self.encoder.intermediate_forward(x, layer_index)
-        elif layer_index == 1:
-            feat = self.encoder(x)
-            feat = self.multiplier * F.normalize(self.head(feat), dim=1) 
-            return feat
+        feat = self.encoder(x)
+        # Flatten the output of the encoder before the head
+        if feat.dim() > 2:
+            feat = torch.flatten(feat, 1)
+        else:
+            feat = feat.squeeze() # Ensure it's 2D if already flattened
+
+        unnorm_features = self.head(feat)
+        features = F.normalize(unnorm_features, dim=1)
+        return features
+
+    # Keep intermediate_forward if needed, but ensure it works with the new structure
+    # def intermediate_forward(self, x, layer_index):
+    #     # This might need adjustment depending on how intermediate features are defined/used
+    #     if layer_index == 0:
+    #         # For torchvision densenet, intermediate might be harder to get cleanly
+    #         # For custom densenet, use its method if available
+    #         if hasattr(self.encoder, 'intermediate_forward'):
+    #              return self.encoder.intermediate_forward(x, layer_index)
+    #         else:
+    #              # Fallback or raise error
+    #              return self.encoder(x) # Return final features if intermediate not defined
+    #     elif layer_index == 1:
+    #         feat = self.forward(x) # Get final normalized features
+    #         # Applying multiplier here seems inconsistent with SupCEHeadResNet, maybe remove?
+    #         # feat = self.multiplier * feat
+    #         return feat
+    #     else:
+    #          raise ValueError(f"Unsupported layer_index: {layer_index}")

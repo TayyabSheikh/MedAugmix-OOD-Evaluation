@@ -5,11 +5,11 @@
 
 # --- Configuration ---
 # !! IMPORTANT: Update this path to the specific ERM checkpoint you want to evaluate !!
-ERM_CKPT_PATH="/home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/10_04_10:31_erm_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2_200_128_trial_erm_1_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar"
+ERM_CKPT_PATH="/home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/16_04_10:28_erm_densenet121_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2_200_128_trial_erm_1_temp_0.1_camelyon17_pm_0.95/checkpoint_max.pth.tar"
 
 DATASET="camelyon17"
 WILDS_ROOT_DIR="../../data" # Relative path from scripts/ to data/
-MODEL="resnet50" # Must match the architecture of the checkpoint
+MODEL="densenet121" # Must match the architecture of the checkpoint
 HEAD="mlp"       # Must match the head of the checkpoint
 GPU_ID=0
 BATCH_SIZE=128

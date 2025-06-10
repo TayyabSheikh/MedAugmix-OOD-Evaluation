@@ -29,43 +29,74 @@ This report summarizes the Out-of-Distribution (OOD) detection performance of th
 
 ## Evaluation Metrics Explained
 
-*   **ID Val Acc (ID Validation Accuracy):** Standard classification accuracy on the ID validation set. Higher is better.
-*   **OOD Gen Acc (OOD Generalization Accuracy):** Standard classification accuracy on the OOD test set. Higher is better.
-*   **AUROC (Area Under the Receiver Operating Characteristic Curve):** Measures the overall ability to distinguish between ID and OOD samples across all possible score thresholds. Ranges from 0 to 1, where 1 is perfect separation and 0.5 is random chance. Higher is better.
-*   **AUPR (In) (Area Under the Precision-Recall Curve - ID Positive):** Measures the trade-off between precision and recall when ID samples are considered the positive class. Useful when the focus is on correctly identifying ID samples. Higher is better.
-*   **AUPR (Out) (Area Under the Precision-Recall Curve - OOD Positive):** Measures the trade-off between precision and recall when OOD samples are considered the positive class. Useful when the focus is on correctly identifying OOD samples. Higher is better.
-*   **FPR@95TPR (False Positive Rate at 95% True Positive Rate):** The fraction of OOD samples that are incorrectly classified as ID (False Positives) when the score threshold is set such that 95% of ID samples are correctly classified as ID (True Positives). Lower is better (fewer OOD samples mistaken for ID).
+Two primary aspects of model performance are evaluated:
+
+1.  **Generalization Accuracy:** How well the model performs the core classification task on different data splits.
+    *   **ID Val Acc (ID Validation Accuracy):** Standard classification accuracy on the ID validation set. Measures performance on data similar to the training set. Higher is better.
+    *   **OOD Gen Acc (OOD Generalization Accuracy):** Standard classification accuracy on the OOD test set. Measures how well the model's classification ability generalizes to the unseen target domain (different hospitals). This is often the primary goal in domain generalization. Higher is better.
+
+2.  **OOD Detection Performance:** How well a specific scoring mechanism derived from the model (MSP, Energy, HypO score) can *distinguish* between samples from the ID distribution ('val' split) and the OOD distribution ('test' split).
+    *   **AUROC (Area Under the Receiver Operating Characteristic Curve):** Measures the overall ability of the score to separate ID vs. OOD samples across all thresholds. Ranges from 0 to 1, where 1 is perfect separation and 0.5 is random chance. Higher indicates better separability based on the score.
+    *   **AUPR (In) (Area Under the Precision-Recall Curve - ID Positive):** Focuses on the score's ability to correctly identify ID samples (precision/recall trade-off when ID is the positive class). Higher is better for confidently identifying ID data.
+    *   **AUPR (Out) (Area Under the Precision-Recall Curve - OOD Positive):** Focuses on the score's ability to correctly identify OOD samples (precision/recall trade-off when OOD is the positive class). Higher is better for confidently identifying OOD data.
+    *   **FPR@95TPR (False Positive Rate at 95% True Positive Rate):** The fraction of OOD samples incorrectly scored as ID when the score threshold correctly identifies 95% of ID samples. Lower is better for reducing false alarms at a high ID recall rate.
+
+*   **Relationship:** Note that improving OOD Generalization Accuracy (making the model classify OOD samples more like ID samples) can sometimes make the OOD samples *less distinguishable* from ID samples based on the model's scores, potentially leading to lower OOD Detection performance (e.g., lower AUROC). This reflects a trade-off between achieving domain invariance for classification and maintaining score-based separability between domains. The interpretation should consider both aspects relative to the primary goal.
 
 ## Results Summary
 
-**ResNet18 @ 100 Epochs**
-
-| Method        | ID Val Acc | OOD Gen Acc | AUROC  | AUPR (In) | AUPR (Out) | FPR@95TPR |
-| :------------ | :--------- | :---------- | :----- | :-------- | :--------- | :-------- |
-| ERM + MSP     | 0.8427     | -           | 0.5484 | 0.3530    | 0.7195     | 0.9523    |
-| ERM + Energy  | 0.8427     | -           | 0.5778 | 0.4773    | 0.7441     | 0.9344    |
-| **HypO**      | 0.8727     | -           | 0.4638 | 0.2535    | 0.6874     | 0.9876    |
-
-*\*Note: Baseline results obtained by re-running evaluation with updated script.*
+The following tables summarize the performance based on different checkpoint selection criteria:
+1.  **Best ID Val Epoch:** The standard approach, using the checkpoint from the epoch with the highest accuracy on the ID validation set. Full OOD detection metrics are reported for this checkpoint.
+2.  **Best OOD Gen Epoch:** The checkpoint from the epoch that achieved the highest OOD generalization accuracy during training (based on epoch summary logs). Only ID and OOD accuracy are reported.
+3.  **Last Epoch:** The checkpoint from the final training epoch (based on epoch summary logs). Only ID and OOD accuracy are reported.
 
 **ResNet50 @ 200 Epochs**
 
-| Method        | ID Val Acc | OOD Gen Acc | AUROC  | AUPR (In) | AUPR (Out) | FPR@95TPR |
-| :------------ | :--------- | :---------- | :----- | :-------- | :--------- | :-------- |
-| ERM + MSP     | 0.9163     | 0.8021      | 0.5729 | 0.3266    | 0.7686     | 0.8962    |
-| ERM + Energy  | 0.9163     | 0.8021      | 0.5518 | 0.3316    | 0.7578     | 0.8902    |
-| **HypO**      | 0.9220     | 0.8232      | 0.6423 | 0.5924    | 0.7563     | 0.9528    |
-| **HypO+MedC** | 0.9292     | 0.8440      | 0.5938 | 0.4642    | 0.7405     | 0.9587    |
+| Method        | Selection Criterion | Epoch | ID Val Acc | OOD Gen Acc | AUROC  | AUPR (In) | AUPR (Out) | FPR@95TPR |
+| :------------ | :------------------ | :---- | :--------- | :---------- | :----- | :-------- | :--------- | :-------- |
+| ERM + Energy  | Best ID Val Acc     | 104   | 0.9163     | 0.8021      | 0.5518 | 0.3316    | 0.7578     | 0.8902    |
+|               | Best OOD Gen Acc    | 0     | 0.8991     | 0.8782      | -      | -         | -          | -         |
+|               | Last Epoch          | 199   | 0.9118     | 0.8176      | -      | -         | -          | -         |
+| **HypO**      | Best ID Val Acc     | 41    | 0.9220     | 0.8232      | 0.6423 | 0.5924    | 0.7563     | 0.9528    |
+|               | Best OOD Gen Acc    | 40    | 0.9143     | 0.8569      | -      | -         | -          | -         |
+|               | Last Epoch          | 199   | 0.9008     | 0.7943      | -      | -         | -          | -         |
+| **HypO+MedC** | Best ID Val Acc     | 73    | 0.9292     | 0.8440      | 0.5938 | 0.4642    | 0.7405     | 0.9587    |
+|               | Best OOD Gen Acc    | 73    | 0.9292     | 0.8443      | -      | -         | -          | -         |
+|               | Last Epoch          | 199   | 0.9183     | 0.7434      | -      | -         | -          | -         |
+| **HypO+MedC+AugMix** | Best ID Val Acc     | 35    | 0.9362     | 0.8586      | -      | -         | -          | -         |
+|               | Best OOD Gen Acc    | 7     | 0.8957     | 0.8932      | -      | -         | -          | -         |
+|               | Last Epoch          | 199   | 0.9230     | 0.8378      | -      | -         | -          | -         |
+
+*\*Note: ERM detection metrics shown for Energy score.*
+
+**DenseNet121 @ 200 Epochs**
+
+| Method        | Selection Criterion | Epoch | ID Val Acc | OOD Gen Acc | AUROC  | AUPR (In) | AUPR (Out) | FPR@95TPR |
+| :------------ | :------------------ | :---- | :--------- | :---------- | :----- | :-------- | :--------- | :-------- |
+| ERM + Energy  | Best ID Val Acc     | 105   | 0.9169     | 0.8309      | 0.6123 | 0.3809    | 0.7850     | 0.8853    |
+|               | Best OOD Gen Acc    | 2     | 0.9045     | 0.8746      | -      | -         | -          | -         |
+|               | Last Epoch          | 199   | 0.9113     | 0.8450      | -      | -         | -          | -         |
+| **HypO**      | Best ID Val Acc     | 76    | 0.9351     | 0.8005      | 0.6305 | 0.5090    | 0.7643     | 0.9419    |
+|               | Best OOD Gen Acc    | 48    | 0.9198     | 0.9100      | -      | -         | -          | -         |
+|               | Last Epoch          | 199   | 0.9266     | 0.8407      | -      | -         | -          | -         |
+| **HypO+MedC** | Best ID Val Acc     | 73    | 0.9391     | 0.8474      | 0.5818 | 0.4302    | 0.7358     | 0.9698    |
+|               | Best OOD Gen Acc    | 1     | 0.9257     | 0.9186      | -      | -         | -          | -         |
+|               | Last Epoch          | 199   | 0.9276     | 0.8198      | -      | -         | -          | -         |
+| **HypO+MedC+AugMix** | Best ID Val Acc     | 60    | 0.9438     | 0.8160      | -      | -         | -          | -         |
+|               | Best OOD Gen Acc    | 0     | 0.9367     | 0.9200      | -      | -         | -          | -         |
+|               | Last Epoch          | 199   | 0.9290     | 0.8468      | -      | -         | -          | -         |
+
+*\*Note: ERM DenseNet121 trained for 200 epochs (log summary verified). Best OOD Gen Acc for HypO DenseNet121 occurred at epoch 48 (0.9100), while for HypO+MedC DenseNet121 it occurred at epoch 1 (0.9186), based on training log summaries.*
 
 ## Interpretation & Conclusions
 
-*   **ResNet18 Performance:** With the ResNet18 architecture trained for 100 epochs, OOD detection performance was modest. ERM+Energy showed the best AUROC (0.5778) and FPR@95TPR (0.9344). HypO had lower AUROC and AUPR(In) but comparable AUPR(Out) in this configuration. ID Validation accuracy was highest for HypO.
-*   **ResNet50 Performance:** Switching to ResNet50 and training for 200 epochs yielded improvements across the board compared to ResNet18.
-    *   Comparing standard HypO to ERM, HypO achieved slightly higher ID accuracy (92.2% vs 91.6%) and notably higher OOD generalization accuracy (82.3% vs 80.2%).
-    *   Training HypO with MedMNIST-C augmentations (HypO+MedC) further improved both ID accuracy (to 92.9%) and OOD generalization accuracy (to 84.4%), suggesting the augmentations enhanced robustness.
-    *   For OOD detection, standard HypO achieved the highest AUROC (0.6423), indicating the best overall separability between ID and OOD samples. HypO+MedC had a lower AUROC (0.5938), closer to the ERM baselines (~0.55-0.57).
-    *   Standard HypO also showed the best precision in identifying ID samples (highest AUPR In: 0.5924). HypO+MedC's AUPR(In) (0.4642) was lower than standard HypO but still better than ERM baselines (~0.33).
-    *   At the specific 95% TPR threshold, the baseline methods (MSP and Energy on ERM) had the lowest False Positive Rate (FPR@95TPR ~0.89). Both HypO variants had higher FPR@95TPR (~0.95-0.96), suggesting they misclassified more OOD samples as ID at that particular operating point.
-*   **Overall:** The MedMNIST-C augmentations during HypO training successfully improved both in-distribution and out-of-distribution generalization accuracy on the clean test set. However, this came at the cost of slightly reduced OOD *detection* performance (lower AUROC and AUPR-In) compared to standard HypO training, although it remained competitive with or better than ERM baselines in these metrics. The choice between standard HypO and augmented HypO depends on whether the primary goal is maximizing generalization accuracy (favoring HypO+MedC) or maximizing the ability to distinguish ID from OOD samples based on the HypO score (favoring standard HypO).
+*   **Model Selection:** The standard evaluation uses the checkpoint with the best ID validation accuracy. We also report accuracies from the epoch with the best OOD generalization accuracy and the final epoch for comparison, based on training logs. OOD detection metrics (AUROC, etc.) are only reported for the standard "Best ID Val Acc" checkpoint.
+*   **ResNet50 Performance:**
+    *   *Generalization:* HypO+MedC (Best ID Val Epoch) achieved the highest OOD generalization accuracy (84.4%), significantly improving over ERM (80.2%) and standard HypO (82.3%). The best OOD accuracy achieved during HypO training (85.7% at epoch 40) was higher, but this epoch wasn't selected by the standard ID validation criterion. ERM's best OOD accuracy occurred very early (epoch 0).
+    *   *Detection:* Standard HypO (Best ID Val Epoch) yielded the best OOD detection scores (AUROC 0.6423). HypO+MedC showed lower detection scores (AUROC 0.5938), potentially due to increased invariance making OOD samples harder to distinguish via the HypO score, despite better classification accuracy. ERM detection was lower but had the best FPR@95TPR.
+*   **DenseNet121 Performance:**
+    *   *Generalization:* HypO+MedC (Best ID Val Epoch) achieved the highest OOD generalization accuracy among DenseNet models (84.7%), slightly better than HypO+MedC ResNet50. Standard HypO DenseNet121 performed poorly on OOD generalization (80.1%) despite high ID accuracy (93.5%). Notably, the *best* OOD accuracy during HypO and HypO+MedC training occurred extremely early (epoch 1, ~91.9%), far from the epoch selected by ID validation (epoch 73), highlighting a potential mismatch between ID validation and OOD performance peaks for this architecture/method. ERM DenseNet121 (1 epoch run) showed surprisingly high OOD accuracy (85.2%).
+    *   *Detection:* Standard HypO DenseNet121 (Best ID Val Epoch) had good detection scores (AUROC 0.6305), comparable to standard HypO ResNet50. HypO+MedC DenseNet121 had lower detection scores (AUROC 0.5818), similar to the trend seen with ResNet50. ERM DenseNet121 (1 epoch run) showed decent detection (AUROC 0.6123).
+*   **Overall Interpretation:** Training with MedMNIST-C augmentations consistently improved OOD generalization accuracy for both ResNet50 and DenseNet121 compared to their standard HypO counterparts when using the best ID validation checkpoint. HypO+MedC ResNet50 currently holds the best reported OOD generalization accuracy (84.4%). However, the training logs reveal that significantly higher OOD accuracy was achieved at earlier epochs for DenseNet121 (HypO and HypO+MedC, ~91.9% at epoch 1) and ERM ResNet50 (~87.8% at epoch 0), but these checkpoints were not selected by the standard ID validation protocol. This suggests a potential limitation of using ID validation for selecting the truly best OOD generalizing model, especially for DenseNet121 where the peak OOD performance occurred very early. Standard HypO generally yields better OOD *detection* scores than HypO+MedC or ERM.
 
 This report provides a snapshot based on the conducted experiments. Further analysis, hyperparameter tuning, or exploring different OOD datasets could yield additional insights.

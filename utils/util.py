@@ -304,10 +304,21 @@ def set_loader_ImageNet(args, eval = False, batch_size = None):
     return train_loader, val_loader, test_loader
 
 
+# Import the DenseNet head class
+from models.densenet import SupCEHeadDenseNet
+
 def set_model(args):
-    
-    # create model
-    model = SupCEHeadResNet(args)
+
+    # create model based on args.model
+    if args.model.startswith('resnet'):
+        print(f"Setting model to ResNet: {args.model}")
+        model = SupCEHeadResNet(args)
+    elif args.model.startswith('densenet'):
+        print(f"Setting model to DenseNet: {args.model}")
+        model = SupCEHeadDenseNet(args)
+    else:
+        raise ValueError(f"Unsupported model architecture specified: {args.model}")
+
     # get the number of model parameters
     print('Number of model parameters: {}'.format(
         sum([p.data.nelement() for p in model.parameters()])))

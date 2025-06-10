@@ -29,8 +29,8 @@ from dataloader.camelyon17_medmnistc_in_augmix import get_camelyon17_medmnistc_i
 # Keep standard loader import for other datasets if needed by set_loader_small
 from dataloader.camelyon17_wilds import get_camelyon17_dataloaders # This might be redundant if only Camelyon17 is used by this script
 
-# Updated description
-parser = argparse.ArgumentParser(description='Script for training with HYPO using MedMNIST-C augmentations for Camelyon17')
+# Updated description for ERM
+parser = argparse.ArgumentParser(description='Script for training with ERM using MedMNIST-C augmentations (and optionally AugMix) for Camelyon17')
 parser.add_argument('--gpu', default=6, type=int, help='which GPU to use')
 parser.add_argument('--seed', default=4, type=int, help='random seed')  # original 4
 parser.add_argument('--w', default=2, type=float,
@@ -46,8 +46,9 @@ parser.add_argument('--id_loc', default="datasets/CIFAR10", type=str, help='loca
 parser.add_argument('--wilds_root_dir', default="./data", type=str, help='Root directory for WILDS datasets.')
 parser.add_argument('--model', default='resnet18', type=str, help='model architecture: [resnet18, wrt40, wrt28, wrt16, densenet100, resnet50, resnet34]')
 parser.add_argument('--head', default='mlp', type=str, help='either mlp or linear head')
-parser.add_argument('--loss', default = 'hypo', type=str, choices = ['hypo', 'erm'],
-                    help='name of experiment')
+# Changed default loss to 'erm'
+parser.add_argument('--loss', default = 'erm', type=str, choices = ['hypo', 'erm'],
+                    help='name of experiment (should be erm for this script)')
 parser.add_argument('--epochs', default=50, type=int,
                     help='number of total epochs to run')
 parser.add_argument('--trial', type=str, default='0',
@@ -221,9 +222,14 @@ def to_np(x): return x.data.cpu().numpy()
 def main():
     tb_log = tb_logger.Logger(logdir=args.tb_folder, flush_secs=2)
 
+    # Adjust wandb project name for ERM runs
+    wandb_project_name = "erm-camelyon17-medmnistc" if args.in_dataset == 'camelyon17' else "erm"
+    if args.use_med_augmix: # Corrected to use_med_augmix
+        wandb_project_name += "-augmix"
+
     wandb.init(
         # Set the project where this run will be logged
-        project="hypo-camelyon17-200-medmnistc" if args.in_dataset == 'camelyon17' else "hypo", # Adjusted wandb project name
+        project=wandb_project_name,
         # We pass a run name (otherwise it’ll be randomly assigned, like sunshine-lollypop-10)
         name=args.name,
         # Track hyperparameters and run metadata
@@ -258,17 +264,15 @@ def main():
 
     model = set_model(args)
 
-    # Define loss functions
+    # Define loss functions - For ERM, only CE is strictly needed for training loop
     criterion_ce = torch.nn.CrossEntropyLoss().cuda() # Standard Cross-Entropy for ERM
-    if args.loss == 'hypo':
-        criterion_comp = CompLoss(args, temperature=args.temp, use_domain = args.use_domain).cuda()
-        criterion_dis = DisLoss(args, model, val_loader, temperature=args.temp).cuda()
-    elif args.loss == 'erm':
-        # No specific HypO criteria needed for ERM training loop itself
-        criterion_comp = None
-        criterion_dis = None
-    else:
-        raise ValueError(f"Unsupported loss type: {args.loss}")
+    criterion_comp = None # Not used in ERM training loop
+    criterion_dis = None # Not used in ERM training loop
+
+    # Add a check to ensure the script is run with --loss erm
+    if args.loss != 'erm':
+        log.warning(f"Warning: This script is intended for ERM training, but --loss is set to {args.loss}. Proceeding with ERM loss calculation.")
+        args.loss = 'erm' # Force loss type to ERM for consistency within this script
 
 
     optimizer = torch.optim.SGD(model.parameters(), lr = args.learning_rate,

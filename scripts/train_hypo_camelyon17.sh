@@ -9,7 +9,7 @@
 # Define arguments
 DATASET="camelyon17"
 WILDS_ROOT_DIR="../../data" # Relative path from scripts/ to data/
-MODEL="resnet50" # Or resnet50, etc.
+MODEL="densenet121" # Or resnet50, etc.
 GPU_ID=0
 EPOCHS=200 # Start with a small number for testing
 BATCH_SIZE=256

@@ -196,9 +196,14 @@ class SupCEHeadResNet(nn.Module):
     def __init__(self, args, multiplier = 1):
         super(SupCEHeadResNet, self).__init__()
         model_fun, dim_in = model_dict[args.model]
+        
+        # Determine if pretrained weights should be used.
+        # Defaults to True if 'model_pretrained' is not in args.
+        use_pretrained = getattr(args, 'model_pretrained', True)
 
         if args.model == 'resnet50':
-            model = models.resnet50(pretrained=True)
+            print(f"Loading ResNet50. Pretrained: {use_pretrained}")
+            model = models.resnet50(pretrained=use_pretrained)
             #for name, p in model.named_parameters():
             #    if not name.startswith('layer4'):
             #        p.requires_grad = False
@@ -212,7 +217,8 @@ class SupCEHeadResNet(nn.Module):
             modules=list(model.children())[:-1] # remove last linear layer
             self.encoder =nn.Sequential(*modules)
         elif args.model == 'resnet34':
-            model = models.resnet34(pretrained=True)
+            print(f"Loading ResNet34. Pretrained: {use_pretrained}")
+            model = models.resnet34(pretrained=use_pretrained)
             for name, p in model.named_parameters():
                 if not name.startswith('layer4'):
                     p.requires_grad = False

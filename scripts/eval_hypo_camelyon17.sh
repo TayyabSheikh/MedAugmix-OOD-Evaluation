@@ -5,11 +5,11 @@
 
 # --- Configuration ---
 # !! IMPORTANT: Update this path if you use a different HypO checkpoint !!
-HYPO_CKPT_PATH="/home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/14_04_16:52_hypo_resnet50_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2.0_200_128_trial_medmnistc_0_temp_0.1_camelyon17_pm_0.95_medmnistc/checkpoint_max.pth.tar"
+HYPO_CKPT_PATH="/home/tsheikh/Thesis/hypo_impl/scripts/checkpoints/camelyon17/16_04_21:45_hypo_densenet121_lr_0.0005_cosine_False_bsz_256_head_mlp_wd_2.0_200_128_trial_medmnistc_0_temp_0.1_camelyon17_pm_0.95_medmnistc/checkpoint_max.pth.tar"
 
 DATASET="camelyon17"
 WILDS_ROOT_DIR="../../data" # Relative path from scripts/ to data/
-MODEL="resnet50" # Must match the architecture of the checkpoint
+MODEL="densenet121" # Must match the architecture of the checkpoint
 HEAD="mlp"       # Must match the head of the checkpoint
 GPU_ID=0
 BATCH_SIZE=128   # Evaluation batch size

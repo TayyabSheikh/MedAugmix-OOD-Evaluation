@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to train HypO with MedMNIST-C augmentations on Camelyon17 (WILDS)
+# Script to train HypO with MedMNIST-C augmentations AND AugMix on Camelyon17 (WILDS)
 
 # Activate conda environment (adjust if your conda init is different)
 # source $(conda info --base)/etc/profile.d/conda.sh # Common way, might vary
@@ -9,7 +9,7 @@
 # Define arguments
 DATASET="camelyon17"
 WILDS_ROOT_DIR="../../data" # Relative path from scripts/ to data/
-MODEL="densenet121" # Or resnet50, etc.
+MODEL="resnet50" # Or resnet50, etc.
 GPU_ID=0
 EPOCHS=200 # Start with a small number for testing
 BATCH_SIZE=256
@@ -18,7 +18,7 @@ WANDB_MODE="online" # Set to "disabled" to turn off wandb logging
 FEAT_DIM=128
 PROTO_M=0.95
 LOSS_SCALE_W=2
-TRIAL="medmnistc_0" # Updated trial ID for augmented run
+TRIAL="medmnistc_in_augmix_0" # Updated trial ID to reflect MedMNIST-C ops in AugMix
 TEMP=0.1 # Added temp based on previous script
 LR_DECAY_EPOCHS="100,150,180" # Added based on previous script
 LR_DECAY_RATE=0.1 # Added based on previous script
@@ -31,7 +31,7 @@ LOSS_TYPE="hypo" # Added based on previous script
 # Construct the command
 # Assumes the script is run from the hypo_impl/scripts directory
 
-echo "Running training script with MedMNIST-C augmentations from scripts directory..."
+echo "Running training script with MedMNIST-C + AugMix augmentations from scripts directory..."
 echo "Command:"
 # Updated python script name
 echo "python ../train_hypo_medmnistc.py \\"
@@ -54,6 +54,9 @@ echo "  --proto_m ${PROTO_M} \\"
 echo "  --w ${LOSS_SCALE_W} \\"
 echo "  --temp ${TEMP} \\"
 echo "  --trial ${TRIAL} \\"
+echo "  --use_med_augmix \\" # Changed to --use_med_augmix
+echo "  --augmix_severity 3 \\" # Default severity
+echo "  --augmix_mixture_width 3 \\" # Default mixture width
 echo "  --mode ${WANDB_MODE}"
 
 # Execute the command (relative to the script's parent directory)
@@ -78,6 +81,9 @@ python ../train_hypo_medmnistc.py \
   --w ${LOSS_SCALE_W} \
   --temp ${TEMP} \
   --trial ${TRIAL} \
+  --use_med_augmix \
+  --augmix_severity 3 \
+  --augmix_mixture_width 3 \
   --mode ${WANDB_MODE}
 
 echo "Training script finished."

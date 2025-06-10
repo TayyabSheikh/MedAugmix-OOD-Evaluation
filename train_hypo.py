@@ -23,7 +23,10 @@ from sklearn.metrics import accuracy_score
 from utils import (CompLoss, CompNGLoss, DisLoss, DisLPLoss,
                 AverageMeter, adjust_learning_rate, warmup_learning_rate,
                 set_loader_small, set_loader_ImageNet, set_model)
-from dataloader.camelyon17_wilds import get_camelyon17_dataloaders # Added import
+from dataloader.camelyon17_wilds import get_camelyon17_dataloaders # For standard baseline
+# NEW: Import for random single MedMNIST-C
+from dataloader.camelyon17_wilds_medmnistc import get_camelyon17_medmnistc_dataloaders as get_camelyon17_random_single_medmnistc
+
 
 parser = argparse.ArgumentParser(description='Script for training with HYPO')
 parser.add_argument('--gpu', default=6, type=int, help='which GPU to use')
@@ -82,6 +85,11 @@ parser.add_argument('--target_domain', type=str, default='cartoon')
 # debug
 parser.add_argument('--use_domain', type=bool, default=False, help='whether to use in-domain negative pairs in compactness loss')
 parser.add_argument('--mode', default='online', choices = ['online','disabled'], help='whether disable wandb logging')
+parser.add_argument('--model_pretrained', default=True, type=lambda x: (str(x).lower() == 'true'), help='Load pretrained model weights (default: True)')
+parser.add_argument('--use_random_single_medmnistc', action='store_true',
+                    help='Apply a single random MedMNIST-C corruption from camelyon17_wilds_medmnistc.py (use_augmix=False)')
+parser.add_argument('--corruption_source_dataset', type=str, default="bloodmnist",
+                    help='MedMNIST dataset name for sourcing corruption functions (e.g., bloodmnist, pathmnist) for --use_random_single_medmnistc')
 
 parser.set_defaults(bottleneck=True)
 parser.set_defaults(augment=True)
@@ -96,16 +104,24 @@ date_time = datetime.now().strftime("%d_%m_%H:%M")
 args.lr_decay_epochs = [int(step) for step in args.lr_decay_epochs.split(',')]
 
 
-# Adjusted naming logic for camelyon17
-if args.in_dataset in ["ImageNet-100", 'CIFAR-10', 'camelyon17']: # Added camelyon17 here
-    args.name = (f"{date_time}_{args.loss}_{args.model}_lr_{args.learning_rate}_cosine_"
-        f"{args.cosine}_bsz_{args.batch_size}_head_{args.head}_wd_{args.w}_{args.epochs}_{args.feat_dim}_"
-        f"trial_{args.trial}_temp_{args.temp}_{args.in_dataset}_pm_{args.proto_m}")
+# Construct base name parts
+base_name_parts = [
+    date_time, args.loss, args.model,
+    f"lr_{args.learning_rate}", f"cosine_{args.cosine}",
+    f"bsz_{args.batch_size}", f"head_{args.head}", f"wd_{args.w}",
+    f"{args.epochs}", f"{args.feat_dim}", f"trial_{args.trial}",
+    f"temp_{args.temp}", args.in_dataset, f"pm_{args.proto_m}"
+]
 
-else:
-    args.name = (f"{date_time}_{args.loss}_std_{args.model}_lr_{args.learning_rate}_cosine_"
-        f"{args.cosine}_bsz_{args.batch_size}_td_{args.target_domain}_head_{args.head}_wd_{args.w}_{args.epochs}_{args.feat_dim}_"
-        f"trial_{args.trial}_temp_{args.temp}_{args.in_dataset}_pm_{args.proto_m}")
+# Add target domain if relevant
+if args.in_dataset not in ["ImageNet-100", 'CIFAR-10', 'CIFAR-100', 'camelyon17']:
+    base_name_parts.insert(7, f"td_{args.target_domain}") # Insert after bsz based on original logic
+
+# NEW: Add suffix for random single MedMNIST-C if used for Camelyon17
+if args.in_dataset == 'camelyon17' and args.use_random_single_medmnistc:
+    base_name_parts.append(f"rsmedc_{args.corruption_source_dataset}")
+
+args.name = "_".join(base_name_parts)
 
 # Adjusted directory logic slightly for clarity (using f-strings)
 args.log_directory = f"logs/{args.in_dataset}/{args.name}/"
@@ -214,15 +230,27 @@ def main():
     if args.in_dataset == "ImageNet-100":
         train_loader, val_loader, test_loader = set_loader_ImageNet(args)
     elif args.in_dataset == 'camelyon17':
-        # Use the new dataloader function
-        train_loader, val_loader, test_loader = get_camelyon17_dataloaders(
-            root_dir=args.wilds_root_dir,
-            batch_size=args.batch_size,
-            num_workers=args.prefetch # Use prefetch argument for num_workers
-        )
-        if train_loader is None:
-             log.error(f"Failed to load Camelyon17 dataset from {args.wilds_root_dir}. Exiting.")
-             return # Exit if dataloaders failed
+        if args.use_random_single_medmnistc: # Check for the new flag
+            log.info(f"Using Camelyon17 with single random MedMNIST-C corruption from '{args.corruption_source_dataset}' set (no torchvision AugMix).")
+            train_loader, val_loader, test_loader = get_camelyon17_random_single_medmnistc(
+                root_dir=args.wilds_root_dir,
+                batch_size=args.batch_size,
+                num_workers=args.prefetch,
+                corruption_dataset_name=args.corruption_source_dataset,
+                use_augmix=False # This is key for this mode
+            )
+        else:
+            # Default Camelyon17 loader (baseline: ToTensor + Normalize)
+            log.info("Using standard Camelyon17 dataloader (baseline augmentations).")
+            train_loader, val_loader, test_loader = get_camelyon17_dataloaders( # From camelyon17_wilds.py
+                root_dir=args.wilds_root_dir,
+                batch_size=args.batch_size,
+                num_workers=args.prefetch
+            )
+        
+        if train_loader is None: # General check after Camelyon17 block
+             log.error(f"Failed to load Camelyon17 dataset. Exiting.")
+             return 
     elif args.in_dataset in ['CIFAR-10', 'CIFAR-100', 'PACS', 'VLCS', 'OfficeHome', 'terra_incognita']:
         # Fallback to original loaders for other datasets
         train_loader, val_loader, test_loader = set_loader_small(args)

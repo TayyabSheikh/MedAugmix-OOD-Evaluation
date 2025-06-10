@@ -8,3 +8,58 @@ __pycache__/
 .DS_Store
 
 *debug.sh
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+*.so
+*.DS_Store
+
+# Virtual Environment
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# IDE / Editor
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+
+# Data & Checkpoints & Logs (common in ML projects)
+data/
+checkpoint_copies/
+checkpoints/
+epoch_summary_logs/
+hyperparameter_search_logs/
+logs/
+save/
+wandb/
+visualizations/
+
+# Generated reports/CSVs in hypo_impl/scripts/
+/scripts/*.csv
+/scripts/*.txt
+*.npz
+*.log
+report.txt
+*.png
+experimental_setup.txt
+experiment_summary_report_extended.txt
+
+# Other
+*.ipynb_checkpoints
+report.txt
+baseline_results/erm_densenet121/ood_metrics_msp_checkpoint_max.txt
+baseline_results/erm_densenet121/ood_metrics_energy_checkpoint_max.txt
+report.txt

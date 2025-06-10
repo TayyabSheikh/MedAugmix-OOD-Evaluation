@@ -1,128 +1,42 @@
-# HYPO: Hyperspherical Out-of-Distribution Generalization
+# Evaluating OOD Generalization with MedAugmix
 
-This codebase provides a Pytorch implementation for the paper: [HYPO: Hyperspherical Out-of-Distribution Generalization](https://openreview.net/pdf?id=VXak3CZZGC) by Haoyue Bai*, Yifei Ming*, Julian Katz-Samuels, and Yixuan Li, .
+This repository contains the official source code for the Master's Thesis: "Evaluating Hyperspherical Embeddings and Targeted Augmentations for Generalizable Medical Image Analysis" by Muhammad Tayyab Sheikh.
 
-**Remarks**: The current codebase is available for preview purposes only and is still under development. We are actively working on eliminating hard-coded links, removing unused arguments, and streamlining the processes for loading models and datasets. Please stay tuned for forthcoming updates.
+## About The Project
 
-### Abstract
+This project systematically benchmarks Out-of-Distribution (OOD) generalization strategies across two distinct medical domains: histopathology (WILDS Camelyon17) and dermatology (Fitzpatrick17k). It compares the specialized representation learning algorithm HYPO against a standard ERM baseline.
 
-Out-of-distribution (OOD) generalization is critical for machine learning models deployed in the real world.  However, achieving this can be fundamentally challenging, as it requires the ability to learn invariant features across different domains or environments. In this paper, we propose a novel framework HYPO (HYPerspherical OOD generalization) that provably learns domain-invariant representations in a hyperspherical space. In particular, our hyperspherical learning algorithm is guided by intra-class variation and inter-class separation principles---ensuring that features from the same class (across different training domains) are closely aligned with their class prototypes, while different class prototypes are maximally separated. We further provide theoretical justifications on how our prototypical learning objective improves the OOD generalization bound. Through extensive experiments on challenging OOD benchmarks, we demonstrate that our approach outperforms competitive baselines and achieves superior performance.
+The key contribution is the proposal and evaluation of **MedAugmix**, a novel data augmentation strategy that adapts the AugMix framework to use targeted, clinically-relevant corruptions from MedMNIST-C. Our findings show that a simple ERM model, when enhanced with MedAugmix, consistently outperforms the specialized HYPO algorithm.
 
+### Built With
+* [PyTorch](https://pytorch.org/)
+* [WILDS Benchmark](https://wilds.stanford.edu/)
+* [MedMNIST-C](https://github.com/francescodisalvo05/medmnistc-api)
 
-## Quick Start
+## Getting Started
 
-### Data Preparation
-In this work, we evaluate the OOD generalization performance over a range of environmental discrepancies such as domains, image corruptions, and perturbations. 
+To get a local copy up and running, follow these simple steps.
 
-**OOD generalization across domains**: The default root directory for ID and OOD datasets is `datasets/`. We consider [PACS](https://arxiv.org/abs/1710.03077), [Office-Home](https://arxiv.org/abs/1706.07522), [VLCS](https://openaccess.thecvf.com/content_iccv_2013/papers/Fang_Unbiased_Metric_Learning_2013_ICCV_paper.pdf), [Terra Incognita](https://arxiv.org/abs/1807.04975). You may use `scripts/download.py` (from [DomainBed](https://github.com/facebookresearch/DomainBed)) to download and prepare the datasets for domain generalization.
+### Prerequisites
 
-**OOD generalization across common corruptions**: The default root directory for ID and OOD datasets is `datasets/`. We consider 
-[CIFAR-10](https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf) & [CIFAR-10-C](https://arxiv.org/abs/1903.12261) and ImageNet-100 & [ImageNet-100-C](https://arxiv.org/abs/1903.12261).
-In alignment with prior works on the [ImageNet-100](https://github.com/deeplearning-wisc/MCM/tree/main) subset, the script for generating the subset is provided [here](https://github.com/deeplearning-wisc/MCM/blob/main/create_imagenet_subset.py).
+You will need Python 3.9+ and pip installed. This project uses CUDA for GPU acceleration.
 
-#### CIFAR-10 & CIFAR-10-C
+### Installation
 
-- Create a folder named `cifar-10/` and a folder `cifar-10-c/` under `$datasets`.
-- Download the dataset from the [CIFAR-10](https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf) and extract the training and validation sets to `$DATA/cifar-10/`.
-- Download the dataset from the [CIFAR-10-C](https://arxiv.org/abs/1903.12261) and extract the training and test sets to `$DATA/cifar-10-c/`. The directory structure should look like
-```
-cifar-10/
-|–– train/ 
-|–– val/
-cifar-10-c/
-|–– CorCIFAR10_train/ 
-|–– CorCIFAR10_test/
-```
+1.  Clone the repo:
+    ```sh
+    git clone [https://github.com/your_username/your_repository_name.git](https://github.com/your_username/your_repository_name.git)
+    cd your_repository_name
+    ```
+2.  Install the required Python packages:
+    ```sh
+    pip install -r requirements.txt
+    ```
+3.  Download the datasets (e.g., WILDS Camelyon17) into a `/data` directory (which is ignored by git).
 
-#### ImageNet-100 & ImageNet-100-C
+## Usage
 
-- Create a folder named `imagenet-100/` and a folder `imagenet-100-c/` under `$datasets`.
-- Create `images/` under `imagenet-100/` and `imagenet-100-c/.
-- Download the dataset from the [ImageNet-100](https://image-net.org/index.php](https://github.com/deeplearning-wisc/MCM/tree/main) and extract the training and validation sets to `$DATA/imagenet-100/images`.
-- Download the dataset from the [ImageNet-100-C](https://arxiv.org/abs/1903.12261) and extract the training and validation sets to `$DATA/imagenet-100-c/images`. The directory structure should look like
-```
-imagenet-100/
-|–– images/
-|   |–– train/ # contains 100 folders like n01440764, n01443537, etc.
-|   |–– val/
-imagenet-100-c/
-|–– images/
-|   |–– train/ 
-|   |–– val/
-```
+To replicate the key experiments, you can use the provided training scripts. For example, to run ERM with MedAugmix on Camelyon17:
 
-## Training and Evaluation 
-
-### Model Checkpoints
-
-**Evaluate pre-trained checkpoints** 
-
-Our checkpoints can be downloaded [here](https://drive.google.com/file/d/1nflCX3YUTwX54QR_jiLlPq9q6Hni2YMe/view?usp=drive_link). Create a directory named `checkpoints/[ID_DATASET]` in the root directory of the project and put the downloaded checkpoints here. For example, for CIFAR-10 and PACS:
-
-```
-checkpoints/
----CIFAR-10/	 	
-------checkpoint_hypo_resnet18_cifar10.pth.tar
----PACS/	 	
-------checkpoint_hypo_resnet50_td_photo.pth.tar
-------checkpoint_hypo_resnet50_td_cartoon.pth.tar
-------checkpoint_hypo_resnet50_td_sketch.pth.tar
-------checkpoint_hypo_resnet50_td_art_painting.pth.tar
-```
-
-The following scripts can be used to evaluate the OOD detection performance:
-
-```
-sh scripts/eval_ckpt_cifar10.sh ckpt_c10 #for CIFAR-10
-sh scripts/eval_ckpt_pacs.sh ckpt_pacs # for PACS
-```
-
-
-
-**Evaluate custom checkpoints** 
-
-If the default directory to save checkpoints is not `checkpoints`, create a softlink to the directory where the actual checkpoints are saved and name it as `checkpoints`. For example, checkpoints for CIFAR-100 (ID) are structured as follows: 
-
-```python
-checkpoints/
----CIFAR-100/
-------name_of_ckpt/
----------checkpoint_500.pth.tar
-```
-
-
-**Train from scratch** 
-
-We provide sample scripts to train from scratch. Feel free to modify the hyperparameters and training configurations.
-
-```
-sh scripts/train_hypo_cifar10.sh
-sh scripts/train_hypo_dg.sh
-```
-
-**Fine-tune from ImageNet pre-trained models** 
-
-We also provide fine-tuning scripts on large-scale datasets such as ImageNet-100.
-
-```
-sh scripts/train_hypo_imgnet100.sh 
-```
-
-
-
-### Citation
-
-If you find our work useful, please consider citing our paper:
-```
-@inproceedings{
-hypo2024,
-title={Provable Out-of-Distribution Generalization in Hypersphere},
-author={Haoyue Bai and Yifei Ming and Julian Katz-Samuels and Yixuan Li},
-booktitle={The Twelfth International Conference on Learning Representations (ICLR)},
-year={2024},
-}
-```
-
-
-### Further discussions
-For more discussions on the method and extensions, feel free to drop an email at hbai39@wisc.edu or ming5@wisc.edu
+```sh
+python train_erm_medmnistc.py --model densenet121 --use_med_augmix --augmix_severity 5 --augmix_mixture_width 1 --batch_size 384 --wilds_root_dir ./data

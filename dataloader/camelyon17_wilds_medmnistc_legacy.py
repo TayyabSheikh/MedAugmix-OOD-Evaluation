@@ -3,7 +3,6 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 import wilds
 import logging
-from PIL import Image # Import PIL Image
 
 # Import necessary components from medmnistc
 try:
@@ -23,11 +22,11 @@ except ImportError:
     CORRUPTIONS_DS = {}
 
 
-def get_camelyon17_medmnistc_dataloaders(root_dir, batch_size, num_workers=4, corruption_dataset_name="bloodmnist", use_augmix=False):
+def get_camelyon17_medmnistc_dataloaders(root_dir, batch_size, num_workers=4, corruption_dataset_name="bloodmnist"):
     """
     Prepares DataLoaders for the Camelyon17 dataset using WILDS,
     applying MedMNIST-C corruptions (specified by corruption_dataset_name)
-    and optionally AugMix to the training set.
+    to the training set.
 
     Args:
         root_dir (str): The directory where the Camelyon17 dataset was downloaded.
@@ -35,7 +34,6 @@ def get_camelyon17_medmnistc_dataloaders(root_dir, batch_size, num_workers=4, co
         num_workers (int): Number of subprocesses to use for data loading.
         corruption_dataset_name (str): The MedMNIST dataset name whose corruption set
                                        should be used (e.g., "bloodmnist").
-        use_augmix (bool): If True, apply AugMix after MedMNIST-C corruptions.
 
     Returns:
         tuple: A tuple containing (train_loader, val_loader, test_loader).
@@ -64,27 +62,11 @@ def get_camelyon17_medmnistc_dataloaders(root_dir, batch_size, num_workers=4, co
         logging.info(f"Using MedMNIST-C corruptions defined for: {corruption_dataset_name}")
 
         # Define augmented transformations for the training set
-        train_transform_list = [
-            # Step 1: Apply MedMNIST-C corruptions. Input: PIL, Output: NumPy array
-            AugMedMNISTC(train_corruptions),
-            # Step 2: Convert the NumPy array output back to PIL Image, required for AugMix
-            transforms.Lambda(lambda x: x if isinstance(x, Image.Image) else transforms.ToPILImage()(x)),
-        ]
-
-        # Conditionally add conversions and AugMix
-        if use_augmix:
-            logging.info("Applying AugMix to training data.")
-            train_transform_list.append(transforms.AugMix())
-            
-        else:
-            logging.info("AugMix not applied to training data.")
-
-        # Add base transforms (ToTensor, Normalize) AFTER all other augmentations
-        # ToTensor can handle PIL or NumPy input.
-        train_transform_list.extend(base_transforms.transforms) # base_transforms starts with ToTensor
-
-        # Compose the final transformation pipeline
-        augmented_transforms = transforms.Compose(train_transform_list)
+        # Apply MedMNIST-C augmentation FIRST (expects PIL image), then base transforms
+        augmented_transforms = transforms.Compose([
+            AugMedMNISTC(train_corruptions), # Apply the targeted corruptions
+            *base_transforms.transforms # Include ToTensor and Normalize
+        ])
 
         # Get the full dataset object
         logging.info(f"Loading Camelyon17 dataset from: {root_dir}")
