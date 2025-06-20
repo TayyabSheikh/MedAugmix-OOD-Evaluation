@@ -1,4 +1,0 @@
-Model,Corruption,Severity,Accuracy
-ERM,clean,0,0.8021139511369247
-Hypo_Clean,clean,0,0.8232417052695934
-Hypo_Corrupted,clean,0,0.6959343475909422
